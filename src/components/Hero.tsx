@@ -1,4 +1,4 @@
-mport { Play, Radio, Zap } from "lucide-react";
+import { Play, Radio, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -37,13 +37,13 @@ const Hero = () => {
 
         {/* Main Title */}
         <h1 className="text-6xl sm:text-7xl lg:text-8xl font-bold mb-6 bg-gradient-to-r from-white via-blue-200 to-purple-300 bg-clip-text text-transparent">
-          OnkelGashi
+          Onkel Gashi
         </h1>
         
         <div className="flex items-center justify-center mb-4">
           <Radio className="w-6 h-6 text-cyan-400 mr-3" />
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-light text-gray-300">
-            Music Radio
+            Radio
           </h2>
         </div>
 
