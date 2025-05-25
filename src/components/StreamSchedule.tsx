@@ -2,8 +2,16 @@ import { Calendar, Clock, Radio, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  getHeadingTextColorClass,
+  getBodyTextColorClass
+} from "@/utils/textColors"; // <- import the color logic
 
-const StreamSchedule = () => {
+type StreamScheduleProps = {
+  activeGenre?: string | null;
+};
+
+const StreamSchedule = ({ activeGenre }: StreamScheduleProps) => {
   const schedule = [
     {
       id: 1,
@@ -31,18 +39,21 @@ const StreamSchedule = () => {
     }
   ];
 
+  // Use utility for genre-safe text color
+  const headingClass = getHeadingTextColorClass(activeGenre || null);
+  const bodyClass = getBodyTextColorClass(activeGenre || null);
+
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 relative">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6 bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent">
+          <h2 className={`text-4xl sm:text-5xl font-bold mb-6 transition-colors duration-300 ${headingClass}`}>
             Stream Schedule
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className={`text-lg max-w-2xl mx-auto transition-colors duration-300 ${bodyClass}`}>
             Catch live shows, exclusive premieres, and special events. Your soundtrack is always on.
           </p>
         </div>
-
         {/* Live Stream Embed Placeholder */}
         <div className="mb-12">
           <Card className="bg-gray-900/50 border-gray-700 p-8 text-center">
@@ -58,7 +69,6 @@ const StreamSchedule = () => {
             </Button>
           </Card>
         </div>
-
         {/* Schedule Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {schedule.map((show) => (
@@ -84,10 +94,8 @@ const StreamSchedule = () => {
                     {show.status === 'featured' && 'FEATURED'}
                   </Badge>
                 </div>
-
                 <h3 className="text-xl font-bold text-white mb-2">{show.title}</h3>
                 <p className="text-gray-400 text-sm mb-4">{show.description}</p>
-                
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">
                     {show.type}
@@ -103,7 +111,6 @@ const StreamSchedule = () => {
             </Card>
           ))}
         </div>
-
         {/* Full Schedule CTA */}
         <div className="text-center mt-12">
           <Button variant="outline" size="lg" className="border-gray-600 text-gray-300 hover:bg-gray-800">

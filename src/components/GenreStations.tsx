@@ -4,7 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 
-// Genre stations data (no change)
+// --- 1. GENRE COLORS FOR AUTO TEXT CONTRAST ---
+const genreColors = {
+  "hip-hop":    { background: "bg-hiphop",   text: "text-yellow-200" },
+  "electronic": { background: "bg-electronic", text: "text-cyan-100" },
+  "rap":        { background: "bg-rap",      text: "text-pink-100" },
+  "rnb":        { background: "bg-rnb",      text: "text-rose-50" },
+  "indie":      { background: "bg-indie",    text: "text-gray-100" },
+  "ambient":    { background: "bg-ambient",  text: "text-teal-50" },
+  "jazz":       { background: "bg-jazz",     text: "text-amber-100" },
+  "rock":       { background: "bg-rock",     text: "text-red-100" },
+  "lofi":       { background: "bg-lofi",     text: "text-indigo-100" },
+  "experimental": { background: "bg-experimental", text: "text-fuchsia-100" },
+  "default":    { background: "bg-default-og", text: "text-white" }
+};
+
+// --- 2. GENRE DATA ---
 const genreStations = [
   {
     id: "hip-hop",
@@ -128,7 +143,7 @@ const genreStations = [
   }
 ];
 
-// Props for active genre (comes from Index.tsx)
+// --- 3. PROPS ---
 type Props = {
   activeGenre: string | null;
   setActiveGenre: (id: string) => void;
@@ -137,8 +152,9 @@ type Props = {
 const GenreStations = ({ activeGenre, setActiveGenre }: Props) => {
   const [playingStation, setPlayingStation] = useState<string | null>(null);
 
-  const currentGenre =
-    genreStations.find((g) => g.id === activeGenre) || genreStations[0];
+  // 4. Get current genre and text color
+  const currentGenre = genreStations.find((g) => g.id === activeGenre) || genreStations[0];
+  const genreTextClass = genreColors[activeGenre || "default"].text;
 
   const handleStationPlay = (stationId: string) => {
     setPlayingStation(playingStation === stationId ? null : stationId);
@@ -148,7 +164,7 @@ const GenreStations = ({ activeGenre, setActiveGenre }: Props) => {
     <section className="relative flex w-full min-h-[700px] max-w-7xl mx-auto rounded-xl overflow-hidden shadow-2xl my-12 bg-gradient-to-br from-[#181c32] to-[#161927]/90">
       {/* Sidebar */}
       <aside className="w-64 flex flex-col bg-gradient-to-b from-[#0e1125]/80 to-[#191b26]/80 border-r border-blue-900/60 p-6">
-        <h2 className="text-2xl font-extrabold mb-4 text-white tracking-wide">Genres</h2>
+        <h2 className={`text-2xl font-extrabold mb-4 tracking-wide ${genreTextClass}`}>Genres</h2>
         <nav className="flex flex-col gap-2">
           {genreStations.map((genre) => (
             <button
@@ -156,7 +172,7 @@ const GenreStations = ({ activeGenre, setActiveGenre }: Props) => {
               className={`flex items-center gap-2 py-2 px-4 rounded-lg text-left transition-all font-semibold
                 ${activeGenre === genre.id
                   ? `bg-gradient-to-r ${genre.color} text-white shadow-lg`
-                  : "text-gray-300 hover:bg-gray-800/60"}
+                  : `${genreTextClass} hover:bg-gray-800/60`}
               `}
               onClick={() => setActiveGenre(genre.id)}
             >
@@ -171,10 +187,10 @@ const GenreStations = ({ activeGenre, setActiveGenre }: Props) => {
       <div className="flex-1 flex flex-col p-10">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className={`text-3xl font-black bg-gradient-to-r ${currentGenre.color} bg-clip-text text-transparent`}>
+            <h3 className={`text-3xl font-black bg-gradient-to-r ${currentGenre.color} bg-clip-text text-transparent ${genreTextClass}`}>
               {currentGenre.name} Stations
             </h3>
-            <p className="text-gray-400">{currentGenre.description}</p>
+            <p className={`mt-2 text-lg ${genreTextClass}`}>{currentGenre.description}</p>
           </div>
           <Badge className={`bg-gradient-to-r ${currentGenre.color} text-white shadow-md`}>
             <Disc className="w-4 h-4 mr-2" />
@@ -202,9 +218,9 @@ const GenreStations = ({ activeGenre, setActiveGenre }: Props) => {
                     )}
                   </div>
                   <div>
-                    <h4 className="font-bold text-white text-lg">{station.name}</h4>
+                    <h4 className={`font-bold text-lg ${genreTextClass}`}>{station.name}</h4>
                     <div className="flex items-center text-sm">
-                      <span className="text-cyan-200">{station.listeners} listening</span>
+                      <span className={`${genreTextClass}`}>{station.listeners} listening</span>
                       {station.isLive && (
                         <Badge className="ml-2 bg-red-600/20 text-red-400 border-red-500/30 px-2 py-1">
                           <span className="w-2 h-2 bg-red-500 rounded-full mr-1 animate-pulse inline-block"></span>

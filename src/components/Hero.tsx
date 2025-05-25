@@ -4,72 +4,43 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import React from "react";
 
-// Spacey star background
-const backgroundStars = (
-  <div className="absolute inset-0 pointer-events-none z-0">
-    {[...Array(120)].map((_, i) => (
-      <div
-        key={i}
-        className="absolute rounded-full"
-        style={{
-          width: `${Math.random() * 2 + 1}px`,
-          height: `${Math.random() * 2 + 1}px`,
-          background: "rgba(255,255,255,0.22)",
-          top: `${Math.random() * 100}%`,
-          left: `${Math.random() * 100}%`,
-          opacity: Math.random() * 0.35 + 0.25,
-          filter: "blur(1px)",
-        }}
-      />
-    ))}
-  </div>
-);
+// Mock function for text colors (since we don't have the actual utility)
+const getHeadingTextColorClass = (genre) => "text-gray-200";
+const getBodyTextColorClass = (genre) => "text-gray-200";
 
-const Hero = () => {
+// Accept activeGenre as prop for full genre color control
+const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
   const [hasPlayed, setHasPlayed] = useState(false);
   const [needUser, setNeedUser] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const welcomePlayed = localStorage.getItem("welcomePlayed");
-    if (!welcomePlayed && !hasPlayed) {
-      // Try autoplay
+    // Using state instead of localStorage for artifact compatibility
+    if (!hasPlayed) {
       setTimeout(() => {
         if (audioRef.current) {
           audioRef.current.play()
             .then(() => {
               setHasPlayed(true);
-              localStorage.setItem("welcomePlayed", "true");
             })
-            .catch(() => {
-              // Blocked by browser, require user gesture
-              setNeedUser(true);
-            });
+            .catch(() => setNeedUser(true));
         }
       }, 600);
     }
-    // If already played, just set flag
-    else if (welcomePlayed) {
-      setHasPlayed(true);
-    }
   }, [hasPlayed]);
 
-  // Handler for fallback overlay
   const handleUserPlay = () => {
     if (audioRef.current) {
       audioRef.current.play().catch(() => {});
       setHasPlayed(true);
       setNeedUser(false);
-      localStorage.setItem("welcomePlayed", "true");
     }
   };
 
+  // -----
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Welcome.mp3 auto-play on load */}
       <audio ref={audioRef} src="/Welcome.mp3" preload="auto" />
-
-      {/* Tap to Enter Overlay (if needed) */}
       {needUser && !hasPlayed && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80">
           <button
@@ -78,32 +49,47 @@ const Hero = () => {
           >
             ▶ Tap to Enter OG Radio
           </button>
-          <div className="mt-6 text-xl text-cyan-200 font-semibold tracking-wider">Welcome audio will start</div>
+          <div className="mt-6 text-xl text-cyan-200 font-semibold tracking-wider">
+            Welcome audio will start
+          </div>
         </div>
       )}
-
-      {/* Spacey Neon/Blurred Background + Stars */}
       <div className="absolute inset-0 bg-gradient-radial from-blue-900/60 via-indigo-950/40 to-transparent"></div>
-      {backgroundStars}
-
-      {/* Animated Waveform */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 opacity-20 z-1">
+      {/* Animated Star BG */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        {[...Array(120)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              width: `${Math.random() * 2 + 1}px`,
+              height: `${Math.random() * 2 + 1}px`,
+              background: "rgba(255,255,255,0.22)",
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              opacity: Math.random() * 0.35 + 0.25,
+              filter: "blur(1px)",
+            }}
+          />
+        ))}
+      </div>
+      {/* Animated Waveform - Moved lower */}
+      <div className="absolute -bottom-8 left-0 right-0 h-32 opacity-20 z-1 pointer-events-none">
         <div className="flex items-end justify-center space-x-1 h-full">
           {[...Array(50)].map((_, i) => (
             <div
               key={i}
               className="bg-gradient-to-t from-cyan-400 to-blue-500 rounded-t animate-pulse"
               style={{
-                width: '3px',
+                width: "3px",
                 height: `${Math.random() * 100 + 20}%`,
                 animationDelay: `${i * 50}ms`,
-                animationDuration: `${Math.random() * 1000 + 1500}ms`
+                animationDuration: `${Math.random() * 1000 + 1500}ms`,
               }}
             ></div>
           ))}
         </div>
       </div>
-
       <div className="relative z-10 text-center max-w-4xl mx-auto">
         {/* Live Badge */}
         <div className="flex justify-center mb-6">
@@ -113,26 +99,24 @@ const Hero = () => {
           </Badge>
         </div>
         {/* Main Title */}
-        <h1 className="text-8xl sm:text-9xl font-black mb-2 bg-gradient-to-r from-[#b180fc] via-blue-300 to-cyan-400 bg-clip-text text-transparent drop-shadow-xl tracking-wide">
-          OG
+        <h1 className={`text-8xl sm:text-9xl font-black mb-2 bg-gradient-to-r from-[#b180fc] via-blue-300 to-cyan-400 bg-clip-text text-transparent drop-shadow-xl tracking-wide`}>
+          OnkelGashi
         </h1>
-        <h2 className="text-7xl sm:text-8xl font-black mb-8 bg-gradient-to-l from-cyan-400 to-purple-400 bg-clip-text text-transparent drop-shadow-xl tracking-wide">
-          RADIO
+        <h2 className={`text-7xl sm:text-8xl font-black mb-8 bg-gradient-to-l from-cyan-400 to-purple-400 bg-clip-text text-transparent drop-shadow-xl tracking-wide`}>
+          Radio
         </h2>
-
+        {/* Subheadline */}
         <div className="flex items-center justify-center mb-4">
           <Radio className="w-6 h-6 text-cyan-400 mr-3" />
-          <span className="text-2xl sm:text-3xl lg:text-4xl font-light text-gray-200 tracking-widest">
-            The Future of Music Broadcasting
+          <span className={`text-2xl sm:text-3xl lg:text-4xl font-light tracking-widest ${getHeadingTextColorClass(activeGenre || null)}`}>
+            Sound for Hyperactive Minds & True Creators
           </span>
         </div>
-
         {/* Tagline */}
-        <p className="text-xl sm:text-2xl text-gray-400 mb-8 max-w-2xl mx-auto leading-relaxed">
-          Enter a living digital soundscape—curated, genre-bending, always evolving.<br />
-          400+ exclusive tracks streaming from the OG cosmos.
+        <p className={`text-xl sm:text-2xl mb-8 max-w-2xl mx-auto leading-relaxed ${getBodyTextColorClass(activeGenre || null)}`}>
+          Enter a living digital soundscape—always genre-bending, always evolving.<br />
+          <span className="text-cyan-300 font-bold">400+</span> tracks designed for restless focus, deep feels, and creative flow—streaming nonstop from the OG multiverse.
         </p>
-
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
           <Button
@@ -151,20 +135,19 @@ const Hero = () => {
             Explore Catalog
           </Button>
         </div>
-
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-8 max-w-md mx-auto text-center">
+        <div className="grid grid-cols-3 gap-8 max-w-md mx-auto text-center -mt-12">
           <div>
             <div className="text-2xl font-bold text-cyan-400">400+</div>
-            <div className="text-sm text-gray-500">Tracks</div>
+            <div className="text-sm text-gray-400">Tracks</div>
           </div>
           <div>
             <div className="text-2xl font-bold text-purple-400">24/7</div>
-            <div className="text-sm text-gray-500">Live Stream</div>
+            <div className="text-sm text-gray-400">Live Stream</div>
           </div>
           <div>
             <div className="text-2xl font-bold text-blue-400">5+</div>
-            <div className="text-sm text-gray-500">Genres</div>
+            <div className="text-sm text-gray-400">Genres</div>
           </div>
         </div>
       </div>

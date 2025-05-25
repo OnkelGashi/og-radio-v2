@@ -1,99 +1,118 @@
-const fs = require("fs");
-const path = require("path");
+import { useState, useRef, useEffect } from "react";
+import { Play, Pause, Heart, Share2, Volume2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
-// Utility: Create dir recursively
-function mkdir(dir) {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-}
+const SONG_SRC = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
 
-// Utility: Create file (with optional content)
-function touch(file, content = "") {
-  if (!fs.existsSync(file)) {
-    fs.writeFileSync(file, content);
-  }
-}
+const NowPlaying = () => {
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isLiked, setIsLiked] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-const structure = {
-  "public": ["placeholder.svg", "robots.txt"],
-  "src": [
-    "App.css", "App.tsx", "index.css", "main.tsx",
-    { "components": [
-      { "ui": [
-        "accordion.tsx", "alert-dialog.tsx", "alert.tsx", "aspect-ratio.tsx",
-        "avatar.tsx", "badge.tsx", "breadcrumb.tsx", "button.tsx", "calendar.tsx",
-        "card.tsx", "carousel.tsx", "chart.tsx", "checkbox.tsx", "collapsible.tsx",
-        "command.tsx", "context-menu.tsx", "dialog.tsx", "drawer.tsx",
-        "dropdown-menu.tsx", "form.tsx", "hover-card.tsx", "input-otp.tsx",
-        "input.tsx", "label.tsx", "menubar.tsx", "navigation-menu.tsx",
-        "pagination.tsx", "popover.tsx", "progress.tsx", "radio-group.tsx",
-        "resizable.tsx", "scroll-area.tsx", "select.tsx", "separator.tsx",
-        "sheet.tsx", "sidebar.tsx", "skeleton.tsx", "slider.tsx", "sonner.tsx",
-        "switch.tsx", "table.tsx", "tabs.tsx", "textarea.tsx", "toast.tsx",
-        "toaster.tsx", "toggle-group.tsx", "toggle.tsx", "tooltip.tsx", "use-toast.ts"
-      ]},
-      "AboutSection.tsx",
-      "GenreStations.tsx",
-      "Hero.tsx",
-      "NowPlaying.tsx",
-      "OnkelGashiPicks.tsx",
-      "PlaylistShowcase.tsx",
-      "SocialFooter.tsx",
-      "StreamSchedule.tsx"
-    ]},
-    { "hooks": [
-      "use-mobile.tsx", "use-toast.ts"
-    ]},
-    { "lib": [
-      "utils.ts"
-    ]},
-    { "pages": [
-      "Index.tsx", "NotFound.tsx"
-    ]}
-  ],
-  ".gitignore": "",
-  "components.json": "",
-  "eslint.config.js": "",
-  "index.html": "",
-  "package.json": "",
-  "postcss.config.js": "",
-  "README.md": "",
-  "tailwind.config.ts": "",
-  "tsconfig.app.json": "",
-  "tsconfig.json": "",
-  "tsconfig.node.json": "",
-  "vite.config.ts": ""
+  // Handle play/pause and progress updates
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isPlaying) {
+      audio.play().catch(() => {});
+    } else {
+      audio.pause();
+    }
+
+    const update = () => {
+      setProgress(audio.currentTime);
+      setDuration(audio.duration || 0);
+    };
+
+    audio.addEventListener("timeupdate", update);
+    audio.addEventListener("loadedmetadata", update);
+
+    return () => {
+      audio.removeEventListener("timeupdate", update);
+      audio.removeEventListener("loadedmetadata", update);
+    };
+  }, [isPlaying]);
+
+  // Try to autoplay on mount (will be blocked silently if browser policy)
+  useEffect(() => {
+    setIsPlaying(true);
+  }, []);
+
+  // Allow clicking progress bar to seek
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    const bar = e.currentTarget;
+    const rect = bar.getBoundingClientRect();
+    const percent = (e.clientX - rect.left) / rect.width;
+    if (audioRef.current && duration) {
+      audioRef.current.currentTime = percent * duration;
+      setProgress(percent * duration);
+    }
+  };
+
+  return (
+    <div className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm border-b border-gray-800">
+      <audio ref={audioRef} src={SONG_SRC} preload="auto" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between py-3">
+          {/* Track Info */}
+          <div className="flex items-center space-x-4 flex-1">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+              <Volume2 className="w-6 h-6 text-white" />
+            </div>
+            <div className="hidden sm:block">
+              <h4 className="text-white font-medium">Faded Frequencies</h4>
+              <p className="text-gray-400 text-sm">OnkelGashi • Future Bass</p>
+            </div>
+            <Badge className="bg-red-600/20 text-red-400 border-red-500/30 hidden md:inline-flex">
+              <div className="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></div>
+              LIVE
+            </Badge>
+          </div>
+          {/* Controls */}
+          <div className="flex items-center space-x-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setIsLiked(!isLiked)}
+              className={`text-gray-400 hover:text-white ${isLiked ? "text-red-400" : ""}`}
+            >
+              <Heart className={`w-4 h-4 ${isLiked ? "fill-current" : ""}`} />
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => setIsPlaying((p) => !p)}
+              className="bg-blue-600 hover:bg-blue-500 text-white rounded-full"
+            >
+              {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-gray-400 hover:text-white"
+            >
+              <Share2 className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+        {/* Progress Bar */}
+        <div className="pb-2">
+          <div
+            className="w-full bg-gray-800 rounded-full h-1 cursor-pointer relative"
+            onClick={handleSeek}
+          >
+            <div
+              className="bg-gradient-to-r from-blue-500 to-purple-500 h-1 rounded-full"
+              style={{ width: duration ? `${(progress / duration) * 100}%` : "0%" }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-function build(root, obj) {
-  Object.entries(obj).forEach(([key, val]) => {
-    const fullPath = path.join(root, key);
-    if (Array.isArray(val)) {
-      mkdir(fullPath);
-      val.forEach((entry) => {
-        if (typeof entry === "string") {
-          // .tsx files get a minimal export by default
-          let content = "";
-          if (entry.endsWith(".tsx")) {
-            const comp = path.basename(entry, ".tsx");
-            content = `export default function ${comp}() { return <div>${comp}</div>; }\n`;
-          }
-          if (entry.endsWith(".ts")) {
-            content = `// ${entry}\n`;
-          }
-          touch(path.join(fullPath, entry), content);
-        } else if (typeof entry === "object") {
-          build(fullPath, entry);
-        }
-      });
-    } else {
-      // root files
-      touch(fullPath, val);
-    }
-  });
-}
-
-build(process.cwd(), structure);
-
-console.log("✅ OG Radio folder structure created!");
+export default NowPlaying;

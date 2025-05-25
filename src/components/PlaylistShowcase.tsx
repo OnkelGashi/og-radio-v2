@@ -3,9 +3,21 @@ import { Play, Shuffle, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import {
+  getHeadingTextColorClass,
+  getBodyTextColorClass
+} from "@/utils/textColors";
 
-const PlaylistShowcase = () => {
+type Props = {
+  activeGenre?: string | null;
+};
+
+const PlaylistShowcase = ({ activeGenre }: Props) => {
   const [activeFilter, setActiveFilter] = useState("All");
+
+  // Dynamic text color classes
+  const headingClass = getHeadingTextColorClass(activeGenre || null);
+  const bodyClass = getBodyTextColorClass(activeGenre || null);
 
   const playlists = [
     {
@@ -66,18 +78,19 @@ const PlaylistShowcase = () => {
 
   const filters = ["All", "Chill", "Energy", "Uplifting", "Atmospheric", "Intense"];
 
-  const filteredPlaylists = activeFilter === "All" 
-    ? playlists 
+  const filteredPlaylists = activeFilter === "All"
+    ? playlists
     : playlists.filter(playlist => playlist.mood === activeFilter);
 
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 relative">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Curated Playlists
+          {/* Dynamic color classes */}
+          <h2 className={`text-4xl sm:text-5xl font-bold mb-6 transition-colors duration-300 ${headingClass}`}>
+            Mo0d Playlists
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-8">
+          <p className={`text-lg max-w-2xl mx-auto mb-8 transition-colors duration-300 ${bodyClass}`}>
             Discover collections crafted for every mood and moment. Each playlist tells a unique sonic story.
           </p>
 
@@ -91,8 +104,8 @@ const PlaylistShowcase = () => {
                 size="sm"
                 onClick={() => setActiveFilter(filter)}
                 className={`rounded-full transition-all duration-300 ${
-                  activeFilter === filter 
-                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white" 
+                  activeFilter === filter
+                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white"
                     : "border-gray-600 text-gray-300 hover:bg-gray-800"
                 }`}
               >
@@ -121,14 +134,12 @@ const PlaylistShowcase = () => {
                     ))}
                   </div>
                 </div>
-
                 {/* Play Button Overlay */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <Button size="lg" className="rounded-full bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30">
                     <Play className="w-6 h-6" />
                   </Button>
                 </div>
-
                 {/* Badges */}
                 <div className="absolute top-4 left-4 flex gap-2">
                   <Badge className="bg-black/40 backdrop-blur-sm text-white text-xs">
@@ -138,7 +149,6 @@ const PlaylistShowcase = () => {
                     {playlist.mood}
                   </Badge>
                 </div>
-
                 {/* Track Count */}
                 <div className="absolute bottom-4 right-4">
                   <span className="bg-black/40 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
@@ -146,13 +156,11 @@ const PlaylistShowcase = () => {
                   </span>
                 </div>
               </div>
-
               <div className="p-6">
                 <h3 className="text-xl font-bold text-white mb-2">{playlist.title}</h3>
                 <p className="text-gray-400 text-sm leading-relaxed mb-4">
                   {playlist.description}
                 </p>
-                
                 <div className="flex items-center justify-between">
                   <Button size="sm" variant="ghost" className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-400/10">
                     <Play className="w-4 h-4 mr-2" />
