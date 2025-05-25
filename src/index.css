@@ -99,3 +99,43 @@
     @apply bg-background text-foreground;
   }
 }
+.neon-border {
+  border: 2px solid #12c2e9;
+  box-shadow: 0 0 24px #c471ed, 0 0 40px #f64f59;
+}
+.neon-shadow {
+  box-shadow: 0 0 32px 6px rgba(0,255,255,0.12), 0 0 64px 16px rgba(177,128,252,0.14);
+}
+.bg-default-og {
+  background: linear-gradient(180deg, #0d1117 0%, #232946 100%);
+}
+.bg-hiphop {
+  background: linear-gradient(135deg, #2d1d14 0%, #eeba5a 80%, #232946 100%);
+}
+.bg-electronic {
+  background: radial-gradient(circle, #033047 10%, #00e4ff 50%, #1a2240 100%);
+}
+.bg-rap {
+  background: linear-gradient(135deg, #260f34 0%, #b180fc 60%, #232946 100%);
+}
+.bg-rnb {
+  background: linear-gradient(135deg, #4e253e 0%, #ff79c6 80%, #232946 100%);
+}
+.bg-indie {
+  background: linear-gradient(135deg, #144927 0%, #8ffff9 80%, #232946 100%);
+}
+.bg-ambient {
+  background: radial-gradient(circle, #0d545a 10%, #80d6ff 60%, #232946 100%);
+}
+.bg-jazz {
+  background: linear-gradient(135deg, #412307 0%, #f6c177 70%, #232946 100%);
+}
+.bg-rock {
+  background: linear-gradient(135deg, #490d19 0%, #f64f59 80%, #232946 100%);
+}
+.bg-lofi {
+  background: linear-gradient(135deg, #201449 0%, #b180fc 50%, #ff79c6 100%);
+}
+.bg-experimental {
+  background: radial-gradient(circle, #5a0d54 10%, #00e4ff 60%, #232946 100%);
+}

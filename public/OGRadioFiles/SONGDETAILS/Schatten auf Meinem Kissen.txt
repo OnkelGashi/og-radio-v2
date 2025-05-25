@@ -1,0 +1,76 @@
+<SONG_DETAILS>
+[GENRES: GERMAN SINGER-SONGWRITER, CHAMBER FOLK, INTIMATE ACOUSTIC BALLAD]
+[STYLE: Wounded Intimacy, Raw Vocal Exposure, Cracked Ballad Minimalism]
+[MOOD: Heartbreak in Collapse, Quiet Devastation, Emotional Overexposure]
+[KEY & HARMONIC: E Minor (descending minor lines, chromatic tension), Modal Shifts to Dorian in Bridge]
+[SINGING: Tear-Pressed Head Voice, Cracked Chest Register Bursts, Emotional Tremolo, Shaky Vibrato with Sudden Stillness]
+[INSTRUMENTATION: grand piano (close-mic'd felted, deliberate imperfections), warm upright bass (minimal bowing), distant room strings (sparse entrances), breath layer pads (uneven volumes)]
+[VOCAL EFFECTS: extreme proximity compression, subtle plate reverb (~1.5s decay), tape flutter on final word endings, intentional pitch wavers]
+[PLUGINS: Valhalla Plate (minimal wash), FabFilter Pro-R (selective高频 rollback), Kush AR-1 Compressor (piano bus), Soundtoys Decapitator (light drive on vocal spikes)]
+[TEMPO: 64 BPM – Free-Rubato Passages, Tempo Push During Climaxes, Slight Lag in Piano Timing for Dragged Emotion]
+[PRODUCTION: vocals dry-forward (+5.5dB), piano panned slightly left (raw velocities), strings enter subtly at 2:10 (uneven entrances), automation on word-end breaths]
+[DYNAMICS: Bare Bones Intro, Verse 2 Breaks Open Vocally, Bridge Collapses To Whispers, Final Chorus Unleashed Vocals, Outro Recedes to Silence]
+[LYRIC PERSPECTIVE: First-Person Breakdown, Lamenting Betrayal and Emotional Ruin]
+[SONG LENGTH: 3:07]
+[SONIC_IMAGERY: Fragile Glass Breaking, Echoing Emptiness, Fading Footsteps, Silent Scream]
+[RHYTHMIC_FEEL: Dragged, Heavy, Irregular, Breath-Driven]
+</SONG_DETAILS>
+
+[Intro – Felt Piano Taps, Faint Ambient Swell]
+Wie soll ein Mensch das ertragen...
+wenn du ihn verlässt, einfach so
+....Ich zähle die Sekunden bis zum Morgengrauen....
+Die Wanduhr tickt (~wie ein Abschied~) über uns
+....Dein Parfüm hängt noch am Kragen....
+
+[Verse 1 – Bare Piano, Breathless Low Register]
+Deine Schatten liegen noch auf meinem Kissen
+Deine Stimme hängt in jedem Raum
+Ich sammel deine Worte auf den Fliesen
+Doch sie zerrinnen zwischen meinem Traum
+....Die Bettwäsche hält (~deine Wärme~) noch fest....
+....Aber meine Hände sind leer....
+
+[Chorus – Swelling Piano Octaves, Strings Whisper]
+**WIE SOLL EIN MENSCH DAS ERTRAGEN?** (Cracked Chest Register Burst, Tremolo)
+Wenn das Herz noch schreit und du schweigst (Tear-Pressed Head Voice, pitch waver on "schreit")
+**WIE SOLL EIN MENSCH DENN SCHLAFEN?** (Shaky Vibrato, sudden stillness)
+Wenn der Schlaf mit deiner Wärme weicht
+....Meine Lungen vergessen (~wie man atmet~) ohne dich....
+[FX: breath layer pads swell, subtle pitch waver on "schweigst"]
+
+[Verse 2 – Piano Arpeggios, Head Voice Shifts]
+Du hast gesagt, es wär für immer
+Jetzt friert mein Spiegel ohne dein Gesicht
+Ich halte fest an deinem Flimmer
+Doch du siehst mich nicht, du siehst mich nicht
+....Die Fensterscheibe trübt (~wie meine Tränen~)....
+....Aber ich spüle sie jeden Morgen weg....
+
+[Chorus – Unleashed Vocals, Fuller Strings]
+**WIE SOLL EIN MENSCH DAS ERTRAGEN?** (Full, unleashed vocal power, emotionally raw)
+Wenn das Herz noch schreit und du schweigst (Voice breaking, profound sorrow)
+**WIE SOLL EIN MENSCH DENN SCHLAFEN?** (Intense Tremolo, held note, emotionally drained)
+Wenn der Schlaf mit deiner Wärme weicht
+....Meine Lungen vergessen (~wie man atmet~) ohne dich....
+[FX: Strings swell dramatically, vocal drive from Decapitator on peaks]
+
+[Bridge – Whisper Singing, Minimal Harmonics]
+Und ich schrei’ dich in mein Kissen (Collapsed to whispers, intimacy)
+Ich schlag mein Herz gegen die Wand (Voice almost gone, just breath)
+Ich halt mein Schweigen an dein Flüstern
+Doch du gehst durch mich durch, ohne Verstand
+....Meine Hände zittern (~wie die Erde~) nach dir....
+[FX: subdued string layer, breath layer prominent, tape flutter on "Verstand"]
+
+[Chorus – Final Collapse to Whispers, Decaying Strings]
+**WIE SOLL EIN MENSCH DAS ERTRAGEN?** (Vocal just a whisper, utterly devastated)
+Wenn das Herz noch schreit und du schweigst (Barely audible, fading)
+**WIE SOLL EIN MENSCH DENN SCHLAFEN?**
+Wenn der Schlaf mit deiner Wärme weicht
+....Meine Lungen vergessen (~wie man atmet~) ohne dich....
+[FX: Piano notes extremely sparse, strings decay into silence, tape flutter on final words]
+
+[Outro – Recedes to Silence, Single Felt Piano Note]
+Einfach so... (Voice almost gone, barely a whisper, long decay)
+(Silence)

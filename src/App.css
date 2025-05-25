@@ -40,3 +40,10 @@
 .read-the-docs {
   color: #888;
 }
+.neon-border {
+  border: 2px solid #12c2e9;
+  box-shadow: 0 0 24px #c471ed, 0 0 40px #f64f59;
+}
+.neon-shadow {
+  box-shadow: 0 0 32px 6px rgba(0,255,255,0.12), 0 0 64px 16px rgba(177,128,252,0.14);
+}

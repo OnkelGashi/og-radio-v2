@@ -3,9 +3,8 @@ import { Disc, Radio, PlayCircle, PauseCircle, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Genre stations data
+// Genre stations data (no change)
 const genreStations = [
   {
     id: "hip-hop",
@@ -129,113 +128,111 @@ const genreStations = [
   }
 ];
 
-const GenreStations = () => {
-  const [currentTab, setCurrentTab] = useState(genreStations[0].id);
+// Props for active genre (comes from Index.tsx)
+type Props = {
+  activeGenre: string | null;
+  setActiveGenre: (id: string) => void;
+};
+
+const GenreStations = ({ activeGenre, setActiveGenre }: Props) => {
   const [playingStation, setPlayingStation] = useState<string | null>(null);
 
+  const currentGenre =
+    genreStations.find((g) => g.id === activeGenre) || genreStations[0];
+
   const handleStationPlay = (stationId: string) => {
-    if (playingStation === stationId) {
-      setPlayingStation(null);
-    } else {
-      setPlayingStation(stationId);
-    }
+    setPlayingStation(playingStation === stationId ? null : stationId);
   };
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 relative">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Genre Stations
-          </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-12">
-            Explore OnkelGashi's diverse sound universe through curated stations for every mood and genre. Dive into sonic worlds crafted with passion and precision.
-          </p>
+    <section className="relative flex w-full min-h-[700px] max-w-7xl mx-auto rounded-xl overflow-hidden shadow-2xl my-12 bg-gradient-to-br from-[#181c32] to-[#161927]/90">
+      {/* Sidebar */}
+      <aside className="w-64 flex flex-col bg-gradient-to-b from-[#0e1125]/80 to-[#191b26]/80 border-r border-blue-900/60 p-6">
+        <h2 className="text-2xl font-extrabold mb-4 text-white tracking-wide">Genres</h2>
+        <nav className="flex flex-col gap-2">
+          {genreStations.map((genre) => (
+            <button
+              key={genre.id}
+              className={`flex items-center gap-2 py-2 px-4 rounded-lg text-left transition-all font-semibold
+                ${activeGenre === genre.id
+                  ? `bg-gradient-to-r ${genre.color} text-white shadow-lg`
+                  : "text-gray-300 hover:bg-gray-800/60"}
+              `}
+              onClick={() => setActiveGenre(genre.id)}
+            >
+              <Radio className="w-4 h-4" />
+              {genre.name}
+            </button>
+          ))}
+        </nav>
+      </aside>
 
-          <Tabs defaultValue={currentTab} onValueChange={setCurrentTab} className="w-full">
-            <div className="relative mb-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-700"></div>
-              </div>
-              <TabsList className="relative flex flex-wrap justify-center gap-1 bg-transparent">
-                {genreStations.map((genre) => (
-                  <TabsTrigger 
-                    key={genre.id}
-                    value={genre.id}
-                    className={`rounded-full transition-all duration-300 border border-gray-700 bg-gray-900/50 backdrop-blur-sm data-[state=active]:bg-gradient-to-r ${genre.color} data-[state=active]:text-white`}
-                  >
-                    <Radio className="w-4 h-4 mr-1.5" />
-                    {genre.name}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </div>
-
-            {genreStations.map((genre) => (
-              <TabsContent key={genre.id} value={genre.id} className="mt-8">
-                <div className="bg-gradient-to-br bg-opacity-10 rounded-xl p-6 border border-gray-800 backdrop-blur-sm">
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <h3 className={`text-2xl font-bold mb-2 bg-gradient-to-r ${genre.color} bg-clip-text text-transparent`}>
-                        {genre.name} Stations
-                      </h3>
-                      <p className="text-gray-400">{genre.description}</p>
-                    </div>
-                    <Badge className={`bg-gradient-to-r ${genre.color} text-white`}>
-                      <Disc className="w-3 h-3 mr-1" />
-                      {genre.stations.filter(s => s.isLive).length} Live
-                    </Badge>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col p-10">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className={`text-3xl font-black bg-gradient-to-r ${currentGenre.color} bg-clip-text text-transparent`}>
+              {currentGenre.name} Stations
+            </h3>
+            <p className="text-gray-400">{currentGenre.description}</p>
+          </div>
+          <Badge className={`bg-gradient-to-r ${currentGenre.color} text-white shadow-md`}>
+            <Disc className="w-4 h-4 mr-2" />
+            {currentGenre.stations.filter((s) => s.isLive).length} Live
+          </Badge>
+        </div>
+        <div className="grid md:grid-cols-2 gap-6">
+          {currentGenre.stations.map((station) => (
+            <Card
+              key={station.id}
+              className={`relative border-2 
+                ${playingStation === station.id
+                  ? `border-pink-400 shadow-[0_0_24px_4px_rgba(244,114,182,0.7)]`
+                  : "border-cyan-500/40 shadow-[0_0_12px_2px_rgba(34,211,238,0.17)]"}
+                bg-gray-900/70 hover:bg-gray-800/80 hover:border-white/80 transition-all duration-300 group overflow-hidden
+              `}
+            >
+              <div className="flex items-center justify-between p-5">
+                <div className="flex items-center">
+                  <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${currentGenre.color} flex items-center justify-center mr-4 shadow-md`}>
+                    {playingStation === station.id ? (
+                      <Volume2 className="w-6 h-6 text-white animate-pulse" />
+                    ) : (
+                      <Radio className="w-6 h-6 text-white" />
+                    )}
                   </div>
-                  
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {genre.stations.map((station) => (
-                      <Card 
-                        key={station.id} 
-                        className={`bg-gray-900/50 border border-gray-800 hover:border-gray-700 transition-all ${playingStation === station.id ? 'ring-2 ring-offset-2 ring-offset-black' : ''} ${playingStation === station.id ? `ring-gradient-to-r ${genre.color}` : ''}`}
-                      >
-                        <div className="flex items-center justify-between p-4">
-                          <div className="flex items-center">
-                            <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${genre.color} flex items-center justify-center mr-4`}>
-                              {playingStation === station.id ? (
-                                <Volume2 className="w-5 h-5 text-white animate-pulse" />
-                              ) : (
-                                <Radio className="w-5 h-5 text-white" />
-                              )}
-                            </div>
-                            <div>
-                              <h4 className="font-medium text-white">{station.name}</h4>
-                              <div className="flex items-center text-sm">
-                                <span className="text-gray-400">{station.listeners} listening</span>
-                                {station.isLive && (
-                                  <Badge className="ml-2 bg-red-600/20 text-red-400 border-red-500/30">
-                                    <div className="w-1.5 h-1.5 bg-red-500 rounded-full mr-1 animate-pulse"></div>
-                                    LIVE
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <Button
-                            onClick={() => handleStationPlay(station.id)}
-                            size="sm"
-                            className={`rounded-full ${playingStation === station.id ? 'bg-white text-black hover:bg-gray-200' : `bg-gradient-to-r ${genre.color} text-white`}`}
-                          >
-                            {playingStation === station.id ? (
-                              <PauseCircle className="w-4 h-4 mr-1" />
-                            ) : (
-                              <PlayCircle className="w-4 h-4 mr-1" />
-                            )}
-                            {playingStation === station.id ? 'Pause' : 'Play'}
-                          </Button>
-                        </div>
-                      </Card>
-                    ))}
+                  <div>
+                    <h4 className="font-bold text-white text-lg">{station.name}</h4>
+                    <div className="flex items-center text-sm">
+                      <span className="text-cyan-200">{station.listeners} listening</span>
+                      {station.isLive && (
+                        <Badge className="ml-2 bg-red-600/20 text-red-400 border-red-500/30 px-2 py-1">
+                          <span className="w-2 h-2 bg-red-500 rounded-full mr-1 animate-pulse inline-block"></span>
+                          LIVE
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </TabsContent>
-            ))}
-          </Tabs>
+                <Button
+                  onClick={() => handleStationPlay(station.id)}
+                  size="sm"
+                  className={`rounded-full shadow-md
+                    ${playingStation === station.id
+                      ? 'bg-white text-black hover:bg-gray-200'
+                      : `bg-gradient-to-r ${currentGenre.color} text-white hover:opacity-90`}
+                  `}
+                >
+                  {playingStation === station.id ? (
+                    <PauseCircle className="w-5 h-5 mr-1" />
+                  ) : (
+                    <PlayCircle className="w-5 h-5 mr-1" />
+                  )}
+                  {playingStation === station.id ? 'Pause' : 'Play'}
+                </Button>
+              </div>
+            </Card>
+          ))}
         </div>
       </div>
     </section>
