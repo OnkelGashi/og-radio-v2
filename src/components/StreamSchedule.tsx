@@ -2,16 +2,15 @@ import { Calendar, Clock, Radio, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  getHeadingTextColorClass,
-  getBodyTextColorClass
-} from "@/utils/textColors"; // <- import the color logic
+import { getHeadingTextColorClass, getBodyTextColorClass } from "@/utils/textColors";
+import ScheduleCTAButton from "@/components/ScheduleCTAButton";
 
 type StreamScheduleProps = {
   activeGenre?: string | null;
 };
 
 const StreamSchedule = ({ activeGenre }: StreamScheduleProps) => {
+  // 👇 PASTE YOUR FULL SCHEDULE ARRAY HERE
   const schedule = [
     {
       id: 1,
@@ -39,35 +38,16 @@ const StreamSchedule = ({ activeGenre }: StreamScheduleProps) => {
     }
   ];
 
-  // Use utility for genre-safe text color
-  const headingClass = getHeadingTextColorClass(activeGenre || null);
-  const bodyClass = getBodyTextColorClass(activeGenre || null);
-
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 relative">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className={`text-4xl sm:text-5xl font-bold mb-6 transition-colors duration-300 ${headingClass}`}>
+          <h2 className={`text-4xl sm:text-5xl font-bold mb-6 transition-colors duration-300 ${getHeadingTextColorClass(activeGenre || null)}`}>
             Stream Schedule
           </h2>
-          <p className={`text-lg max-w-2xl mx-auto transition-colors duration-300 ${bodyClass}`}>
+          <p className={`text-lg max-w-2xl mx-auto transition-colors duration-300 ${getBodyTextColorClass(activeGenre || null)}`}>
             Catch live shows, exclusive premieres, and special events. Your soundtrack is always on.
           </p>
-        </div>
-        {/* Live Stream Embed Placeholder */}
-        <div className="mb-12">
-          <Card className="bg-gray-900/50 border-gray-700 p-8 text-center">
-            <div className="aspect-video bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center mb-6 border border-gray-600">
-              <div className="text-center">
-                <Radio className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">Live Stream Player</h3>
-                <p className="text-gray-400 text-sm">Stream embed will be integrated here</p>
-              </div>
-            </div>
-            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white">
-              Listen Live
-            </Button>
-          </Card>
         </div>
         {/* Schedule Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -113,10 +93,9 @@ const StreamSchedule = ({ activeGenre }: StreamScheduleProps) => {
         </div>
         {/* Full Schedule CTA */}
         <div className="text-center mt-12">
-          <Button variant="outline" size="lg" className="border-gray-600 text-gray-300 hover:bg-gray-800">
-            <Calendar className="w-5 h-5 mr-2" />
+          <ScheduleCTAButton>
             View Full Schedule
-          </Button>
+          </ScheduleCTAButton>
         </div>
       </div>
     </section>

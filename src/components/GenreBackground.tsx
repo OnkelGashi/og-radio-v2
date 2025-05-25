@@ -15,7 +15,9 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
     case "lofi":
       return (
         <div className="fixed inset-0 -z-10 overflow-hidden transition-all duration-700">
-          <div className="absolute inset-0 bg-gradient-to-b from-pink-200/30 via-blue-200/40 to-purple-400/30 blur-sm" />
+          {/* Deeper pastel gradient with dark overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-pink-400/60 via-blue-400/60 to-purple-700/70 blur-md" />
+          <div className="absolute inset-0 bg-black/30" />
           {[...Array(9)].map((_, i) => (
             <div
               key={i}
@@ -44,14 +46,7 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
               }}
             />
           ))}
-          <style>
-            {`
-            @keyframes lofiFloat {
-              0% { transform: translateY(0px);}
-              100% { transform: translateY(-30px);}
-            }
-            `}
-          </style>
+          <style>{`@keyframes lofiFloat { 0% { transform: translateY(0px);} 100% { transform: translateY(-30px);} }`}</style>
         </div>
       );
 
@@ -59,7 +54,9 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
     case "hip-hop":
       return (
         <div className="fixed inset-0 -z-10 overflow-hidden transition-all duration-700 bg-black">
-          <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900/80 to-[#181c32] opacity-90" />
+          {/* Deeper city gradient */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900/90 to-[#181c32] opacity-95" />
+          <div className="absolute inset-0 bg-black/40" />
           <svg
             className="absolute bottom-0 left-0 w-full h-44 opacity-70"
             viewBox="0 0 1440 300"
@@ -108,7 +105,9 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
     case "electronic":
       return (
         <div className="fixed inset-0 -z-10 overflow-hidden transition-all duration-700">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#00e4ff] via-[#0f0025]/90 to-[#b180fc] opacity-90 blur-sm" />
+          {/* More saturated neon gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#00e4ff] via-[#0f0025] to-[#b180fc] opacity-95 blur-md" />
+          <div className="absolute inset-0 bg-black/40" />
           <div className="absolute inset-0 flex justify-center items-center">
             {[...Array(3)].map((_, i) => (
               <div
@@ -153,7 +152,9 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
     case "rap":
       return (
         <div className="fixed inset-0 -z-10 overflow-hidden transition-all duration-700 bg-black">
-          <div className="absolute inset-0 bg-gradient-to-br from-black via-fuchsia-800/30 to-indigo-900/70 opacity-90" />
+          {/* Deeper purple/fuchsia gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-black via-fuchsia-900/60 to-indigo-900/90 opacity-95" />
+          <div className="absolute inset-0 bg-black/40" />
           <svg
             className="absolute bottom-0 left-0 w-full h-40 opacity-70"
             viewBox="0 0 1440 300"
@@ -178,7 +179,9 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
     case "rnb":
       return (
         <div className="fixed inset-0 -z-10 overflow-hidden transition-all duration-700">
-          <div className="absolute inset-0 bg-gradient-to-b from-pink-400/40 via-pink-200/30 to-purple-800/40 blur-lg" />
+          {/* Deeper pink/purple gradient */}
+          <div className="absolute inset-0 bg-gradient-to-b from-pink-700/60 via-pink-400/40 to-purple-900/80 blur-lg" />
+          <div className="absolute inset-0 bg-black/30" />
           <svg
             className="absolute bottom-0 left-0 w-full h-32"
             viewBox="0 0 1440 120"
@@ -216,7 +219,9 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
     case "indie":
       return (
         <div className="fixed inset-0 -z-10 overflow-hidden transition-all duration-700">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#eff6ff] via-[#94a3b8]/50 to-[#161927]/90" />
+          {/* Deeper blue/gray gradient */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#c7d2fe] via-[#64748b]/70 to-[#161927]/95" />
+          <div className="absolute inset-0 bg-black/30" />
           {/* Starfield */}
           {[...Array(100)].map((_, i) => (
             <div
@@ -245,7 +250,9 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
     case "ambient":
       return (
         <div className="fixed inset-0 -z-10 overflow-hidden transition-all duration-700">
-          <div className="absolute inset-0 bg-gradient-to-b from-sky-200/60 via-teal-300/40 to-[#161927] blur-sm" />
+          {/* Deeper teal/blue gradient */}
+          <div className="absolute inset-0 bg-gradient-to-b from-sky-900/80 via-teal-800/60 to-[#161927] blur-md" />
+          <div className="absolute inset-0 bg-black/30" />
           {/* Floating orbs */}
           {[...Array(8)].map((_, i) => (
             <div
@@ -279,7 +286,9 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
     case "jazz":
       return (
         <div className="fixed inset-0 -z-10 overflow-hidden transition-all duration-700">
-          <div className="absolute inset-0 bg-gradient-to-br from-amber-300/50 via-orange-100/40 to-orange-700/70 blur-sm" />
+          {/* Deeper amber/orange gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-700/60 via-orange-400/40 to-orange-900/80 blur-md" />
+          <div className="absolute inset-0 bg-black/30" />
           {[...Array(14)].map((_, i) => (
             <div
               key={i}
@@ -300,7 +309,9 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
     case "rock":
       return (
         <div className="fixed inset-0 -z-10 overflow-hidden transition-all duration-700 bg-[#200C10]">
-          <div className="absolute inset-0 bg-gradient-to-b from-red-700/30 via-red-900/20 to-black opacity-90 blur-sm" />
+          {/* Deeper red/black gradient */}
+          <div className="absolute inset-0 bg-gradient-to-b from-red-900/60 via-red-900/40 to-black opacity-95 blur-md" />
+          <div className="absolute inset-0 bg-black/40" />
           {/* Lightning flashes */}
           {[...Array(4)].map((_, i) => (
             <svg
@@ -331,7 +342,9 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
     case "experimental":
       return (
         <div className="fixed inset-0 -z-10 overflow-hidden transition-all duration-700">
-          <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-600/40 via-violet-900/50 to-purple-700/40 blur-sm" />
+          {/* Deeper fuchsia/purple gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-900/60 via-violet-900/70 to-purple-900/80 blur-md" />
+          <div className="absolute inset-0 bg-black/30" />
           {[...Array(12)].map((_, i) => (
             <div
               key={i}

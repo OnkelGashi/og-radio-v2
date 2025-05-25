@@ -84,7 +84,7 @@ const SocialFooter = () => (
               variant="outline"
               size="lg"
               asChild
-              className={`border-gray-700 text-gray-400 ${social.color} hover:bg-gray-800 transition-all duration-300 group rounded-full px-6 py-3 font-semibold`}
+              className={`border-gray-700 text-black ${social.color} hover:bg-gray-800 transition-all duration-300 group rounded-full px-6 py-3 font-semibold`}
             >
               <a href={social.url} target="_blank" rel="noopener noreferrer" aria-label={social.name}>
                 <social.icon className="w-7 h-7 mr-2 group-hover:scale-110 transition-transform" />
@@ -97,7 +97,7 @@ const SocialFooter = () => (
 
       {/* Social Feed Preview */}
       <div className="mb-16">
-        <h3 className="text-2xl font-bold text-white mb-8 text-center">Recent Activity</h3>
+        <h3 className="text-2xl font-bold text-black mb-8 text-center">Recent Activity</h3>
         <div className="grid md:grid-cols-3 gap-6">
           {recentActivity.map((activity, index) => (
             <div key={index} className="bg-gray-900/50 border border-gray-700 rounded-lg p-6 hover:border-gray-600 transition-colors">

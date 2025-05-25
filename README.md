@@ -1,74 +1,95 @@
-# Welcome to your Lovable project
+# OnkelGashi Radio
 
-## Project info
+Welcome to the OnkelGashi Radio project! This is a web-based radio station application designed to deliver a unique audio experience.
 
-**URL**: https://lovable.dev/projects/00250c05-c5b4-47d0-bf15-aeca5a519f5c
+## Project Setup & Local Development
 
-## How can I edit this code?
+To get this project up and running on your local machine, follow these steps.
 
-There are several ways of editing your application.
+**Prerequisites:**
 
-**Use Lovable**
+* Node.js (LTS version recommended)
+* npm (comes with Node.js) or yarn
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/00250c05-c5b4-47d0-bf15-aeca5a519f5c) and start prompting.
+You can use [nvm (Node Version Manager)](https://github.com/nvm-sh/nvm#installing-and-updating) to manage Node.js versions.
 
-Changes made via Lovable will be committed automatically to this repo.
+**Installation & Running Locally:**
 
-**Use your preferred IDE**
+1.  **Clone the repository:**
+    ```sh
+    git clone <YOUR_GIT_REPOSITORY_URL>
+    ```
+2.  **Navigate to the project directory:**
+    ```sh
+    cd <YOUR_PROJECT_NAME> # e.g., cd OGRadio
+    ```
+3.  **Install dependencies:**
+    ```sh
+    npm install
+    ```
+    (or `yarn install` if you prefer yarn)
+4.  **Start the development server:**
+    ```sh
+    npm run dev
+    ```
+    This will start the Vite development server, typically available at `http://localhost:8080` (as per your `vite.config.ts`). The site will auto-reload when you make changes to the code.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Editing the Code
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+You can edit this project using several methods:
 
-Follow these steps:
+* **Your Preferred IDE (Recommended):**
+    * Open the cloned project folder in your favorite code editor (like VS Code, WebStorm, etc.).
+    * Make your changes, and the development server (if running via `npm run dev`) will reflect them instantly.
+    * Commit and push your changes to your Git repository.
+
+* **Edit a file directly in GitHub:**
+    * Navigate to the desired file(s) in your GitHub repository.
+    * Click the "Edit" button (pencil icon).
+    * Make your changes and commit them directly to the repository.
+
+* **Use GitHub Codespaces:**
+    * From your repository's main page on GitHub, click the "Code" button.
+    * Select the "Codespaces" tab and create a new codespace.
+    * This provides a full development environment in your browser where you can edit, run, and commit your changes.
+
+## Technologies Used
+
+This project is built with a modern web stack:
+
+* **Vite:** Fast build tool and development server.
+* **TypeScript:** For static typing and improved code quality.
+* **React:** A JavaScript library for building user interfaces.
+* **shadcn/ui:** A collection of re-usable UI components.
+* **Tailwind CSS:** A utility-first CSS framework for rapid UI development.
+
+## Building for Production
+
+To create an optimized production build of the application:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+npm run build
 ```
 
-**Edit a file directly in GitHub**
+This command will generate static assets in the `dist` folder, which can then be deployed.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Deployment
 
-**Use GitHub Codespaces**
+You can deploy this Vite-based React application to various hosting platforms. Some popular choices include:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+* Vercel
+* Netlify
+* GitHub Pages (for static SPAs)
+* AWS Amplify, Google Firebase Hosting, Azure Static Web Apps, etc.
 
-## What technologies are used for this project?
+Typically, you would connect your Git repository to one of these services. They can then automatically build and deploy your site whenever you push changes to your main branch.
 
-This project is built with:
+## Connecting a Custom Domain
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Most hosting platforms (like Vercel, Netlify, etc.) allow you to connect a custom domain to your deployed project. Please refer to the documentation of your chosen hosting provider for specific instructions on how to set this up.
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/00250c05-c5b4-47d0-bf15-aeca5a519f5c) and click on Share -> Publish.
+Remember to replace `<YOUR_GIT_REPOSITORY_URL>` and `<YOUR_PROJECT_NAME>` with your actual project details.
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
-"# OGRadio" 
+Let me know if you'd like any adjustments to this README or if you're ready to dive into specific enhancements for OnkelGashi Radio!

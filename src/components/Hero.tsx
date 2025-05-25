@@ -2,27 +2,19 @@ import { useEffect, useRef, useState } from "react";
 import { Play, Radio, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import React from "react";
+import { getHeadingTextColorClass, getBodyTextColorClass } from "@/utils/textColors";
 
-// Mock function for text colors (since we don't have the actual utility)
-const getHeadingTextColorClass = (genre) => "text-gray-200";
-const getBodyTextColorClass = (genre) => "text-gray-200";
-
-// Accept activeGenre as prop for full genre color control
 const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
   const [hasPlayed, setHasPlayed] = useState(false);
   const [needUser, setNeedUser] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    // Using state instead of localStorage for artifact compatibility
     if (!hasPlayed) {
       setTimeout(() => {
         if (audioRef.current) {
           audioRef.current.play()
-            .then(() => {
-              setHasPlayed(true);
-            })
+            .then(() => setHasPlayed(true))
             .catch(() => setNeedUser(true));
         }
       }, 600);
@@ -37,7 +29,6 @@ const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
     }
   };
 
-  // -----
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden">
       <audio ref={audioRef} src="/Welcome.mp3" preload="auto" />
@@ -55,7 +46,6 @@ const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
         </div>
       )}
       <div className="absolute inset-0 bg-gradient-radial from-blue-900/60 via-indigo-950/40 to-transparent"></div>
-      {/* Animated Star BG */}
       <div className="absolute inset-0 pointer-events-none z-0">
         {[...Array(120)].map((_, i) => (
           <div
@@ -73,7 +63,6 @@ const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
           />
         ))}
       </div>
-      {/* Animated Waveform - Moved lower */}
       <div className="absolute -bottom-8 left-0 right-0 h-32 opacity-20 z-1 pointer-events-none">
         <div className="flex items-end justify-center space-x-1 h-full">
           {[...Array(50)].map((_, i) => (
@@ -91,18 +80,16 @@ const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
         </div>
       </div>
       <div className="relative z-10 text-center max-w-4xl mx-auto">
-        {/* Live Badge */}
         <div className="flex justify-center mb-6">
           <Badge className="bg-red-600/20 text-red-400 border-red-500/30 px-4 py-2 text-sm font-medium">
             <div className="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></div>
             LIVE NOW
           </Badge>
         </div>
-        {/* Main Title */}
-        <h1 className={`text-8xl sm:text-9xl font-black mb-2 bg-gradient-to-r from-[#b180fc] via-blue-300 to-cyan-400 bg-clip-text text-transparent drop-shadow-xl tracking-wide`}>
+        <h1 className="text-8xl sm:text-9xl font-black mb-2 bg-gradient-to-r from-[#b180fc] via-blue-300 to-cyan-400 bg-clip-text text-transparent drop-shadow-xl tracking-wide">
           OnkelGashi
         </h1>
-        <h2 className={`text-7xl sm:text-8xl font-black mb-8 bg-gradient-to-l from-cyan-400 to-purple-400 bg-clip-text text-transparent drop-shadow-xl tracking-wide`}>
+        <h2 className="text-7xl sm:text-8xl font-black mb-8 bg-gradient-to-l from-cyan-400 to-purple-400 bg-clip-text text-transparent drop-shadow-xl tracking-wide">
           Radio
         </h2>
         {/* Subheadline */}
@@ -117,7 +104,6 @@ const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
           Enter a living digital soundscape—always genre-bending, always evolving.<br />
           <span className="text-cyan-300 font-bold">400+</span> tracks designed for restless focus, deep feels, and creative flow—streaming nonstop from the OG multiverse.
         </p>
-        {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
           <Button
             size="lg"
@@ -129,13 +115,12 @@ const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
           <Button
             variant="outline"
             size="lg"
-            className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white px-8 py-4 rounded-full text-lg transition-all duration-300"
+            className="border-gray-600 text-black hover:bg-gray-800 hover:text-white px-8 py-4 rounded-full text-lg transition-all duration-300"
           >
             <Zap className="w-5 h-5 mr-2" />
             Explore Catalog
           </Button>
         </div>
-        {/* Stats */}
         <div className="grid grid-cols-3 gap-8 max-w-md mx-auto text-center -mt-12">
           <div>
             <div className="text-2xl font-bold text-cyan-400">400+</div>

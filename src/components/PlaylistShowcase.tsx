@@ -3,10 +3,7 @@ import { Play, Shuffle, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import {
-  getHeadingTextColorClass,
-  getBodyTextColorClass
-} from "@/utils/textColors";
+import { getHeadingTextColorClass, getBodyTextColorClass } from "@/utils/textColors";
 
 type Props = {
   activeGenre?: string | null;
@@ -15,10 +12,7 @@ type Props = {
 const PlaylistShowcase = ({ activeGenre }: Props) => {
   const [activeFilter, setActiveFilter] = useState("All");
 
-  // Dynamic text color classes
-  const headingClass = getHeadingTextColorClass(activeGenre || null);
-  const bodyClass = getBodyTextColorClass(activeGenre || null);
-
+  // 👇 PASTE YOUR FULL PLAYLIST ARRAY HERE
   const playlists = [
     {
       id: 1,
@@ -77,24 +71,28 @@ const PlaylistShowcase = ({ activeGenre }: Props) => {
   ];
 
   const filters = ["All", "Chill", "Energy", "Uplifting", "Atmospheric", "Intense"];
-
   const filteredPlaylists = activeFilter === "All"
     ? playlists
     : playlists.filter(playlist => playlist.mood === activeFilter);
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 relative">
+    <section className={`py-20 px-4 sm:px-6 lg:px-8 relative transition-colors duration-500`}>
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          {/* Dynamic color classes */}
-          <h2 className={`text-4xl sm:text-5xl font-bold mb-6 transition-colors duration-300 ${headingClass}`}>
+          <h2 className={`text-4xl sm:text-5xl font-bold mb-6 transition-colors duration-300 ${
+    activeGenre === "ambient" || activeGenre === "indie" || activeGenre === "lofi" || activeGenre === "jazz"
+      ? "text-white"
+      : getHeadingTextColorClass(activeGenre || null)
+  }`}>
             Mo0d Playlists
           </h2>
-          <p className={`text-lg max-w-2xl mx-auto mb-8 transition-colors duration-300 ${bodyClass}`}>
+          <p className={`text-2xl max-w-2xl mx-auto mb-8 transition-colors duration-300 ${
+    activeGenre === "ambient" || activeGenre === "indie" || activeGenre === "lofi" || activeGenre === "jazz"
+      ? "text-white"
+      : getBodyTextColorClass(activeGenre || null)
+  }`}>
             Discover collections crafted for every mood and moment. Each playlist tells a unique sonic story.
           </p>
-
-          {/* Mood Filters */}
           <div className="flex flex-wrap justify-center gap-3 mb-8">
             <Filter className="w-5 h-5 text-gray-400 mr-2 self-center" />
             {filters.map((filter) => (
@@ -106,7 +104,7 @@ const PlaylistShowcase = ({ activeGenre }: Props) => {
                 className={`rounded-full transition-all duration-300 ${
                   activeFilter === filter
                     ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white"
-                    : "border-gray-600 text-gray-300 hover:bg-gray-800"
+                    : "border-gray-600 text-black hover:bg-gray-800"
                 }`}
               >
                 {filter}
@@ -114,12 +112,10 @@ const PlaylistShowcase = ({ activeGenre }: Props) => {
             ))}
           </div>
         </div>
-
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredPlaylists.map((playlist) => (
             <Card key={playlist.id} className="bg-gray-900/50 border-gray-700 hover:border-gray-600 transition-all duration-300 group overflow-hidden backdrop-blur-sm hover:transform hover:scale-105">
               <div className={`h-48 bg-gradient-to-br ${playlist.color} relative overflow-hidden`}>
-                {/* Dynamic Background Pattern */}
                 <div className="absolute inset-0 opacity-20">
                   <div className="grid grid-cols-8 gap-1 h-full">
                     {[...Array(64)].map((_, i) => (
@@ -134,13 +130,11 @@ const PlaylistShowcase = ({ activeGenre }: Props) => {
                     ))}
                   </div>
                 </div>
-                {/* Play Button Overlay */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <Button size="lg" className="rounded-full bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30">
                     <Play className="w-6 h-6" />
                   </Button>
                 </div>
-                {/* Badges */}
                 <div className="absolute top-4 left-4 flex gap-2">
                   <Badge className="bg-black/40 backdrop-blur-sm text-white text-xs">
                     {playlist.genre}
@@ -149,7 +143,6 @@ const PlaylistShowcase = ({ activeGenre }: Props) => {
                     {playlist.mood}
                   </Badge>
                 </div>
-                {/* Track Count */}
                 <div className="absolute bottom-4 right-4">
                   <span className="bg-black/40 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
                     {playlist.trackCount} tracks

@@ -19,8 +19,8 @@ export default function Index() {
       {/* Genre-reactive animated background */}
       <GenreBackground genre={activeGenre} />
 
-      <NowPlaying />
-      <Hero />
+      <NowPlaying activeGenre={activeGenre} />
+      <Hero activeGenre={activeGenre} />
       <AboutSection activeGenre={activeGenre} />
       <GenreStations activeGenre={activeGenre} setActiveGenre={setActiveGenre} />
       <PlaylistShowcase activeGenre={activeGenre} />
