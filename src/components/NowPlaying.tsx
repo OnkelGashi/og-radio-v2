@@ -1,32 +1,19 @@
 // src/components/NowPlaying.tsx
 import { useState, useRef, useEffect } from "react";
 import {
-  Play,
-  Pause,
-  Heart,
-  Share2,
-  Volume2,
-  Clock,
-  X as Close,
-  Youtube,
-  Instagram,
-  Users,
-  MessageCircle,
-  Music,
-  Copy,
-  Check
+  Play, Pause, Heart, Share2, Volume2, Clock, X as Close,
+  Youtube, Instagram, Users, MessageCircle, Music, Copy, Check
 } from "lucide-react";
 import { useAudioStore } from "@/stores/audioStore"; // Import the store
 
 // --- Config ---
-// const SONG_SRC = "/faded-frequencies.mp3"; // Moved to store as currentSongSrc initial
-const shareLinks = [ /* ...your existing shareLinks array... */ ]; //
+const shareLinks = [ /* ...your existing shareLinks array... */ ];
 
 // Utility
-const pad = (n: number) => n.toString().padStart(2, "0"); //
-const fadeInAudio = (audio: HTMLAudioElement, targetVolume = 1, seconds = 7) => { //
+const pad = (n: number) => n.toString().padStart(2, "0");
+const fadeInAudio = (audio: HTMLAudioElement, targetVolume = 1, seconds = 7) => {
   audio.volume = 0;
-  audio.play();
+  audio.play(); // fadeInAudio will attempt to play
   let step = 0;
   const steps = seconds * 10;
   const interval = setInterval(() => {
@@ -36,17 +23,17 @@ const fadeInAudio = (audio: HTMLAudioElement, targetVolume = 1, seconds = 7) => 
   }, 100);
 };
 
-const NowPlaying = () => { // Removed activeGenre prop as it's not used here
-  const { 
-    audioElement, 
-    setAudioElement, 
-    isPlaying, 
-    togglePlay, 
-    setIsPlaying, // Direct setter from store
-    currentSongSrc, 
-    playSong // To play the initial song
+const NowPlaying = () => {
+  const {
+    audioElement: audioElementFromStore,
+    setAudioElement,
+    isPlaying,
+    togglePlay, // Use this for the play/pause button
+    currentSongSrc,
+    // Get the direct setter for event handlers to avoid re-fetching state in handlers
+    setIsPlaying: storeSetIsPlaying
   } = useAudioStore();
-  
+
   // Local states for UI elements not directly tied to audio playback core
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(202);
@@ -60,120 +47,175 @@ const NowPlaying = () => { // Removed activeGenre prop as it's not used here
 
   const localAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Setup audio element in store and attach listeners
+  // Effect 1: Initialize audio element in store and set up event listeners.
   useEffect(() => {
-    if (localAudioRef.current) {
-      setAudioElement(localAudioRef.current); // Set the audio element in the store
-      
-      const audio = localAudioRef.current;
+    const audio = localAudioRef.current;
+    if (audio) {
+      if (audioElementFromStore !== audio) {
+        setAudioElement(audio); // Set the audio element in the store
+      }
+
+      // Ensure src is set based on the store's currentSongSrc
+      if (!audio.src || !audio.src.endsWith(currentSongSrc)) {
+        audio.src = currentSongSrc;
+        audio.load(); // Load the new source
+      }
+
       const updateProgressAndDuration = () => {
-        setProgress(audio.currentTime);
-        setDuration(audio.duration || 0);
+        if (audio.duration && !isNaN(audio.duration)) {
+          setProgress(audio.currentTime);
+          setDuration(audio.duration);
+        } else {
+          setProgress(0);
+          setDuration(0);
+        }
       };
-      
-      const handlePlay = () => setIsPlaying(true);
-      const handlePause = () => setIsPlaying(false);
+
+      // Event handlers that update the store
+      const handleAudioPlay = () => storeSetIsPlaying(true);
+      const handleAudioPauseOrEnded = () => storeSetIsPlaying(false);
+      const handleAudioError = () => {
+        console.error("Audio Element Error:", audio.error);
+        storeSetIsPlaying(false);
+      };
 
       audio.addEventListener("timeupdate", updateProgressAndDuration);
       audio.addEventListener("loadedmetadata", updateProgressAndDuration);
-      audio.addEventListener("play", handlePlay);
-      audio.addEventListener("pause", handlePause);
-      audio.addEventListener("ended", handlePause); // Set isPlaying to false when song ends
+      audio.addEventListener("play", handleAudioPlay);
+      audio.addEventListener("pause", handleAudioPauseOrEnded);
+      audio.addEventListener("ended", handleAudioPauseOrEnded);
+      audio.addEventListener("error", handleAudioError);
 
-
-      // Autoplay logic (or initial play from store)
-      if (audio.src === window.location.origin + currentSongSrc && isPlaying && audio.paused) {
-         audio.play().catch(e => console.error("Error on initial play sync:", e));
-      } else if (isPlaying && audio.src !== window.location.origin + currentSongSrc) {
-         playSong(); // This will set src and play
-      } else if(isPlaying && !audio.paused) {
-        // Already playing, do nothing
+      // Attempt to play if store says isPlaying and audio is paused (e.g., after src change or initial load)
+      // This will respect browser autoplay policies if audioContext is not yet active
+      if (useAudioStore.getState().isPlaying && audio.paused) {
+        audio.play().catch(e => {
+          console.warn("NowPlaying (Effect 1): audio.play() failed. User interaction likely needed.", e);
+          storeSetIsPlaying(false); // Update store if play fails
+        });
       }
-      else {
-        // Initial autoplay when component mounts if store says isPlaying
-        // This now defers to store's `playSong` or `togglePlay`
-      }
-
 
       return () => {
         audio.removeEventListener("timeupdate", updateProgressAndDuration);
         audio.removeEventListener("loadedmetadata", updateProgressAndDuration);
-        audio.removeEventListener("play", handlePlay);
-        audio.removeEventListener("pause", handlePause);
-        audio.removeEventListener("ended", handlePause);
+        audio.removeEventListener("play", handleAudioPlay);
+        audio.removeEventListener("pause", handleAudioPauseOrEnded);
+        audio.removeEventListener("ended", handleAudioPauseOrEnded);
+        audio.removeEventListener("error", handleAudioError);
       };
     }
-  }, [setAudioElement, setIsPlaying, currentSongSrc, playSong, isPlaying]); // Added dependencies
+  }, [localAudioRef, setAudioElement, audioElementFromStore, storeSetIsPlaying, currentSongSrc]);
+
+
+  // Effect 2: React to changes in `isPlaying` from the store or `currentSongSrc`
+  // This effect ensures the HTML audio element's state (play/pause) matches the store.
+  useEffect(() => {
+    const audio = audioElementFromStore; // Use the element from the store
+    if (audio) {
+      // Sync source if it changed in the store
+      if (audio.currentSrc !== window.location.origin + currentSongSrc && currentSongSrc) {
+        console.log("NowPlaying (Effect 2): Song source changed in store, updating HTML element.");
+        audio.src = currentSongSrc;
+        audio.load();
+        // If it was supposed to be playing, it will attempt to play after loading.
+        // The 'play' event will then update the store via Effect 1's listener.
+        if (isPlaying) {
+            // Let the load event and subsequent play event handle isPlaying,
+            // or play directly if confident about user interaction.
+            // For now, rely on the 'play' event listener set up in Effect 1.
+            // Or, more directly:
+            audio.play().catch(e => {
+                console.warn("NowPlaying (Effect 2): audio.play() after src change failed.", e);
+                storeSetIsPlaying(false);
+            });
+        }
+        return; // Exit because src is changing, further actions will happen on 'loadedmetadata' or 'play'
+      }
+
+      // Sync play/pause state
+      if (isPlaying) {
+        if (audio.paused) {
+          audio.play().catch(e => {
+            console.warn("NowPlaying (Effect 2): audio.play() failed.", e);
+            storeSetIsPlaying(false); // Correct store state if play fails
+          });
+        }
+      } else {
+        if (!audio.paused) {
+          audio.pause();
+        }
+      }
+    }
+  }, [isPlaying, audioElementFromStore, currentSongSrc, storeSetIsPlaying]);
+
 
   // Seek
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => { //
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     const bar = e.currentTarget;
     const rect = bar.getBoundingClientRect();
     const percent = (e.clientX - rect.left) / rect.width;
-    if (audioElement && duration) { // Use audioElement from store
-      audioElement.currentTime = percent * duration;
-      setProgress(percent * duration);
+    if (audioElementFromStore && duration) {
+      audioElementFromStore.currentTime = percent * duration;
+      setProgress(percent * duration); // Optimistically update UI
     }
   };
 
   // Timer/Alarm
-  const getTime = () => { //
+  const getTime = () => {
     const d = new Date();
     return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
   };
-  useEffect(() => { //
+  useEffect(() => {
     const checkAlarm = () => {
       if (alarmActive && !alarmTriggered && alarmTime && getTime() === alarmTime) {
         setAlarmActive(false);
         setAlarmTriggered(true);
-        if (audioElement) { // Use audioElement from store
-          fadeInAudio(audioElement, 1, 7);
-          setIsPlaying(true); // Update store
+        if (audioElementFromStore) {
+          fadeInAudio(audioElementFromStore, 1, 7);
+          // fadeInAudio calls play(), which should trigger 'play' event & update store
         }
         setTimeout(() => setAlarmTriggered(false), 20000);
       }
     };
     const interval = setInterval(checkAlarm, 1000);
     return () => clearInterval(interval);
-  }, [alarmActive, alarmTriggered, alarmTime, audioElement, setIsPlaying]);
-
-   // Autoplay on mount (can be controlled by store's initial isPlaying state)
-   useEffect(() => {
-    if (!audioElement?.src) { // Check if src is not set, to avoid re-playing on HMR
-        playSong(); // Play the default song from store on mount
-    } else if (isPlaying && audioElement?.paused) {
-        audioElement.play().catch(e => console.error("Error on mount play sync:", e));
-    }
-  }, [playSong, isPlaying, audioElement]);
+  }, [alarmActive, alarmTriggered, alarmTime, audioElementFromStore]);
 
 
-  const formatTime = (seconds: number) => { //
+  const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
-  
-  // UI Handlers
-  const handleLike = () => { /* ...no change... */ }; //
-  const handleCopy = () => { /* ...no change... */ }; //
 
+  const handleLike = () => { /* Your existing like logic */
+    setIsLiked((prev) => !prev);
+    setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+  };
+
+  const shareUrl = "https://www.youtube.com/@OnkelGashiMusic"; // Example URL
+  const handleCopy = () => { /* Your existing copy logic */
+    navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1200);
+  };
+
+  // --- THIS IS YOUR ORIGINAL JSX STRUCTURE ---
   return (
     <>
       <div className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm border-b border-gray-800">
-        {/* Use localAudioRef for the actual HTML element */}
-        <audio ref={localAudioRef} src={currentSongSrc} preload="auto" /> 
+        <audio ref={localAudioRef} preload="auto" /> {/* src will be set by useEffect */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* TOP BAR */}
           <div className="flex items-center justify-between py-2">
             {/* Left: Track Info */}
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              {/* ... (Volume2 icon and Track Info text) ... */}
               <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-                 <Volume2 className="w-5 h-5 text-white" />
+                <Volume2 className="w-5 h-5 text-white" />
               </div>
               <div className="min-w-0">
                 <h4 className="text-white text-base truncate font-semibold">
-                  Faded Frequencies 
+                  Faded Frequencies
                 </h4>
                 <p className="text-gray-400 text-xs truncate">
                   OnkelGashi • Future Bass
@@ -196,9 +238,8 @@ const NowPlaying = () => { // Removed activeGenre prop as it's not used here
               </div>
             </div>
 
-            {/* ... (Rest of the JSX is the same, using local state for UI elements like alarm, like, share) ... */}
-             {/* Right: CLOCK/TIMER, Like, Share */}
-             <div className="flex items-center gap-4 ml-6">
+            {/* Right: CLOCK/TIMER, Like, Share */}
+            <div className="flex items-center gap-4 ml-6">
               {/* Clock/Timer */}
               <div className="flex items-center text-xs bg-gray-800 px-2 py-0.5 rounded-lg text-cyan-300 font-mono mr-2">
                 <Clock className="w-4 h-4 mr-1 text-cyan-400" />
@@ -322,6 +363,21 @@ const NowPlaying = () => { // Removed activeGenre prop as it's not used here
 };
 
 // Live-updating clock (updates every 5 sec)
-function CurrentTime() { /* ...no change... */ } //
+function CurrentTime() {
+  const [now, setNow] = useState(() => {
+    const d = new Date();
+    return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const d = new Date();
+      setNow(`${pad(d.getHours())}:${pad(d.getMinutes())}`);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return <span suppressHydrationWarning>{now}</span>;
+}
 
 export default NowPlaying;

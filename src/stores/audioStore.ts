@@ -3,6 +3,7 @@ import { create } from 'zustand';
 
 interface AudioState {
   audioElement: HTMLAudioElement | null;
+  audioContext: AudioContext | null; // Add AudioContext here
   isPlaying: boolean;
   currentSongSrc: string;
   setAudioElement: (element: HTMLAudioElement) => void;
@@ -14,54 +15,75 @@ interface AudioState {
 
 export const useAudioStore = create<AudioState>((set, get) => ({
   audioElement: null,
+  audioContext: null, // Initialize
   isPlaying: false,
-  currentSongSrc: "/faded-frequencies.mp3", // Default song from your NowPlaying
+  currentSongSrc: "/faded-frequencies.mp3",
+
   setAudioElement: (element) => {
-    const { audioElement: existingElement } = get();
-    if (existingElement) {
-        // Clean up old listeners if any were attached directly or via the store
-        // For now, we assume NowPlaying.tsx handles its own internal listeners
+    const { audioContext: existingCtx } = get();
+    let currentCtx = existingCtx;
+    if (element && !existingCtx) {
+      currentCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
     }
-    set({ audioElement: element });
+    set({ audioElement: element, audioContext: currentCtx });
   },
-  setIsPlaying: (playing) => set({ isPlaying: playing }),
+
+  setIsPlaying: (playing) => set(state => {
+    // Only update if the state is actually different
+    if (state.isPlaying !== playing) {
+      return { isPlaying: playing };
+    }
+    return {}; // No change
+  }),
+
   togglePlay: () => {
-    const { audioElement, isPlaying, currentSongSrc } = get();
+    const { audioElement, isPlaying, audioContext, currentSongSrc } = get();
+    if (audioContext && audioContext.state === "suspended") {
+      audioContext.resume(); // Attempt to resume context first
+    }
     if (audioElement) {
       if (isPlaying) {
         audioElement.pause();
-        set({ isPlaying: false });
+        // setIsPlaying(false) will be called by the 'pause' event listener
       } else {
         if (audioElement.src !== window.location.origin + currentSongSrc) {
-            audioElement.src = currentSongSrc; // Ensure full path if needed or handle base URL
+             audioElement.src = currentSongSrc;
+             audioElement.load(); // Important when changing src
         }
         audioElement.play().catch(error => {
-          console.error("Error playing audio:", error);
-          set({ isPlaying: false });
+          console.error("audioStore: Error in togglePlay -> play():", error);
+          set({ isPlaying: false }); // Ensure state reflects failure
         });
-        set({ isPlaying: true });
+        // setIsPlaying(true) will be called by the 'play' event listener
       }
     }
   },
+
   playSong: (src?: string) => {
-    const { audioElement, currentSongSrc } = get();
+    const { audioElement, audioContext, currentSongSrc } = get();
     const songToPlay = src || currentSongSrc;
+    if (audioContext && audioContext.state === "suspended") {
+      audioContext.resume();
+    }
     if (audioElement) {
       if (audioElement.src !== window.location.origin + songToPlay) {
         audioElement.src = songToPlay;
+        audioElement.load();
       }
       audioElement.play().catch(error => {
-          console.error("Error playing audio:", error);
-          set({ isPlaying: false });
-        });
-      set({ isPlaying: true, currentSongSrc: songToPlay });
+        console.error(`audioStore: Error in playSong(${songToPlay}):`, error);
+        set({ isPlaying: false });
+      });
+      // Event listener will call setIsPlaying(true)
+      set({ currentSongSrc: songToPlay }); // Update current song src
     }
   },
+
   pauseSong: () => {
     const { audioElement } = get();
     if (audioElement) {
       audioElement.pause();
-      set({ isPlaying: false });
+      // Event listener will call setIsPlaying(false)
     }
   },
 }));
