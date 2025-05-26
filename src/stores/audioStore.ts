@@ -3,87 +3,81 @@ import { create } from 'zustand';
 
 interface AudioState {
   audioElement: HTMLAudioElement | null;
-  audioContext: AudioContext | null; // Add AudioContext here
   isPlaying: boolean;
   currentSongSrc: string;
-  setAudioElement: (element: HTMLAudioElement) => void;
+  setAudioElement: (element: HTMLAudioElement | null) => void;
   setIsPlaying: (playing: boolean) => void;
   togglePlay: () => void;
-  playSong: (src?: string) => void;
-  pauseSong: () => void;
+  playNewSong: (src: string) => void; // To explicitly change song and play
 }
 
 export const useAudioStore = create<AudioState>((set, get) => ({
   audioElement: null,
-  audioContext: null, // Initialize
   isPlaying: false,
-  currentSongSrc: "/faded-frequencies.mp3",
+  currentSongSrc: "/faded-frequencies.mp3", // Default song
 
   setAudioElement: (element) => {
-    const { audioContext: existingCtx } = get();
-    let currentCtx = existingCtx;
-    if (element && !existingCtx) {
-      currentCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-    set({ audioElement: element, audioContext: currentCtx });
+    console.log("AudioStore: setAudioElement called with", element);
+    set({ audioElement: element });
   },
 
   setIsPlaying: (playing) => set(state => {
-    // Only update if the state is actually different
     if (state.isPlaying !== playing) {
+      console.log("AudioStore: setIsPlaying from", state.isPlaying, "to", playing);
       return { isPlaying: playing };
     }
-    return {}; // No change
+    console.log("AudioStore: setIsPlaying called but state is already", playing);
+    return {}; // No change, crucial to prevent loops
   }),
 
   togglePlay: () => {
-    const { audioElement, isPlaying, audioContext, currentSongSrc } = get();
-    if (audioContext && audioContext.state === "suspended") {
-      audioContext.resume(); // Attempt to resume context first
-    }
+    const { audioElement, isPlaying, currentSongSrc, setIsPlaying, playNewSong } = get();
+    console.log("AudioStore: togglePlay called. isPlaying:", isPlaying, "audioElement:", !!audioElement);
     if (audioElement) {
+      const expectedSrc = window.location.origin + currentSongSrc;
+      // If src is different, treat it like playing a new song
+      if (audioElement.currentSrc !== expectedSrc && !audioElement.src.endsWith(currentSongSrc)) {
+        console.log("AudioStore: togglePlay - src mismatch. Calling playNewSong for", currentSongSrc);
+        playNewSong(currentSongSrc); // This will set src, load, and set isPlaying:true
+        return;
+      }
+
       if (isPlaying) {
-        audioElement.pause();
-        // setIsPlaying(false) will be called by the 'pause' event listener
+        console.log("AudioStore: togglePlay - pausing audio.");
+        audioElement.pause(); // Event listener will set isPlaying: false
       } else {
-        if (audioElement.src !== window.location.origin + currentSongSrc) {
-             audioElement.src = currentSongSrc;
-             audioElement.load(); // Important when changing src
-        }
+        console.log("AudioStore: togglePlay - playing audio.");
         audioElement.play().catch(error => {
-          console.error("audioStore: Error in togglePlay -> play():", error);
-          set({ isPlaying: false }); // Ensure state reflects failure
+          console.error("AudioStore: Error in togglePlay -> play():", error);
+          setIsPlaying(false); // Ensure state reflects failure
         });
-        // setIsPlaying(true) will be called by the 'play' event listener
+        // Event listener will set isPlaying: true
       }
+    } else {
+      // If no audio element yet, set intent to play. NowPlaying should pick this up.
+      console.warn("AudioStore: togglePlay called, audioElement is null. Setting intent to play:", !isPlaying);
+      setIsPlaying(!isPlaying); // Set the desired state
     }
   },
 
-  playSong: (src?: string) => {
-    const { audioElement, audioContext, currentSongSrc } = get();
-    const songToPlay = src || currentSongSrc;
-    if (audioContext && audioContext.state === "suspended") {
-      audioContext.resume();
-    }
+  playNewSong: (src: string) => {
+    const { audioElement, setIsPlaying } = get();
+    console.log("AudioStore: playNewSong called with src:", src);
+    // Set new song src and explicitly state intent to play
+    set({ currentSongSrc: src, isPlaying: true }); 
     if (audioElement) {
-      if (audioElement.src !== window.location.origin + songToPlay) {
-        audioElement.src = songToPlay;
-        audioElement.load();
+      // If the element already exists, update its src and play
+      const expectedSrc = window.location.origin + src;
+      if (audioElement.currentSrc !== expectedSrc || !audioElement.src.endsWith(src)) {
+        audioElement.src = src;
+        audioElement.load(); // Important!
       }
+      // play() will be attempted by NowPlaying's effect reacting to isPlaying:true & new src loaded via 'canplay'
+      // Or we can try to play here, and NowPlaying's effect will just confirm.
       audioElement.play().catch(error => {
-        console.error(`audioStore: Error in playSong(${songToPlay}):`, error);
-        set({ isPlaying: false });
+          console.error("AudioStore: Error in playNewSong -> play():", error);
+          setIsPlaying(false);
       });
-      // Event listener will call setIsPlaying(true)
-      set({ currentSongSrc: songToPlay }); // Update current song src
-    }
-  },
-
-  pauseSong: () => {
-    const { audioElement } = get();
-    if (audioElement) {
-      audioElement.pause();
-      // Event listener will call setIsPlaying(false)
     }
   },
 }));
