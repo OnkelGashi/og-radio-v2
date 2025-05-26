@@ -139,3 +139,19 @@
 .bg-experimental {
   background: radial-gradient(circle, #5a0d54 10%, #00e4ff 60%, #232946 100%);
 }
+@layer utilities {
+  @keyframes wavePulse {
+    0% {
+      transform: scaleY(0.3);
+      opacity: 0.7;
+    }
+    50% {
+      transform: scaleY(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scaleY(0.3);
+      opacity: 0.7;
+    }
+  }
+}

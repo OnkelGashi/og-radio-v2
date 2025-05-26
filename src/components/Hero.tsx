@@ -14,12 +14,13 @@ const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
   const handleEnterRadio = () => {
     setShowEnterScreen(false);
     if (audioRef.current) {
-      audioRef.current.play()
+      audioRef.current
+        .play()
         .then(() => {
           setIsPlayingWelcome(true);
         })
         .catch((error) => {
-          console.error('Welcome audio play failed after interaction:', error);
+          console.error("Welcome audio play failed after interaction:", error);
           setIsPlayingWelcome(false);
         });
     }
@@ -32,11 +33,11 @@ const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
     };
 
     if (currentAudio) {
-      currentAudio.addEventListener('ended', handleAudioEnd);
+      currentAudio.addEventListener("ended", handleAudioEnd);
     }
     return () => {
       if (currentAudio) {
-        currentAudio.removeEventListener('ended', handleAudioEnd);
+        currentAudio.removeEventListener("ended", handleAudioEnd);
       }
     };
   }, []);
@@ -101,20 +102,36 @@ const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
             />
           ))}
         </div>
-        <div className="absolute -bottom-8 left-0 right-0 h-32 opacity-20 -z-10 pointer-events-none">
-          <div className="flex items-end justify-center space-x-1 h-full">
-            {[...Array(50)].map((_, i) => (
-              <div
-                key={`wave-${i}`}
-                className="bg-gradient-to-t from-cyan-400 to-blue-500 rounded-t animate-pulse"
-                style={{
-                  width: "3px",
-                  height: `${Math.random() * 100 + 20}%`,
-                  animationDelay: `${i * 50}ms`,
-                  animationDuration: `${Math.random() * 1000 + 1500}ms`,
-                }}
-              ></div>
-            ))}
+        <div className="absolute -bottom-16 left-0 right-0 h-20 opacity-75 -z-10 pointer-events-none">
+          <div className="flex items-end justify-center space-x-1.5 h-full">
+            {[...Array(35)].map((_, i) => {
+              // Create a symmetric effect, peaking in the middle
+              const distanceFromCenter = Math.abs(i - Math.floor(35 / 2));
+              const maxPeakHeight = 80; // Max height in %
+              const minPeakHeight = 20; // Min height in %
+              const peakinessFactor = Math.max(0, 1 - (distanceFromCenter / (35 / 2)) * 0.8); // Sharper peak
+
+              const baseHeight = minPeakHeight + (maxPeakHeight - minPeakHeight) * peakinessFactor * 0.5; // Base height influenced by position
+              const randomHeightFactor = Math.random() * (maxPeakHeight * 0.5 * peakinessFactor);
+
+              return (
+                <div
+                  key={`wave-${i}`}
+                  // Changed gradient to match button, adjust as needed
+                  className="bg-gradient-to-t from-purple-600 to-pink-500 rounded-t" 
+                  style={{
+                    width: "4px", // Thicker bars
+                    height: `${baseHeight + randomHeightFactor}%`, // Adjusted height logic
+                    animationName: 'wavePulse', // Using custom animation name
+                    animationDuration: `${1 + Math.random() * 0.5}s`, // Slightly more uniform duration
+                    animationDelay: `${distanceFromCenter * 0.05 + Math.random() * 0.1}s`, // Delay based on distance from center for a ripple/peak effect
+                    animationIterationCount: 'infinite',
+                    animationTimingFunction: 'ease-in-out',
+                    animationDirection: 'alternate',
+                  }}
+                />
+              );
+            })}
           </div>
         </div>
 

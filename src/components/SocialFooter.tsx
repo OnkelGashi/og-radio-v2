@@ -18,50 +18,53 @@ const socialLinks = [
     name: "YouTube",
     icon: Youtube,
     url: "https://www.youtube.com/@OnkelGashiMusic",
-    color: "hover:text-red-500"
+    color: "hover:text-red-500",
   },
   {
     name: "TikTok",
     icon: TikTokIcon,
     url: "https://www.tiktok.com/@OnkelGashi",
-    color: "hover:text-black dark:hover:text-white"
+    color: "hover:text-black dark:hover:text-white",
   },
   {
     name: "Twitch",
     icon: Twitch,
     url: "https://www.twitch.tv/OnkelGashi",
-    color: "hover:text-purple-400"
+    color: "hover:text-purple-400",
   },
   {
     name: "Discord",
     icon: MessageCircle,
     url: "https://discord.gg/zsXM4w4B69",
-    color: "hover:text-indigo-300"
+    color: "hover:text-indigo-300",
   },
   {
     name: "Instagram",
     icon: Instagram,
     url: "https://www.instagram.com/OnkelGashi",
-    color: "hover:text-pink-400"
-  }
+    color: "hover:text-pink-400",
+  },
 ];
 
 const recentActivity = [
   {
     platform: "Twitch",
-    content: "🔥 New track premiere tonight at midnight! Who's ready for some deep frequencies?",
-    time: "2h ago"
+    content:
+      "🔥 New track premiere tonight at midnight! Who's ready for some deep frequencies?",
+    time: "2h ago",
   },
   {
     platform: "TikTok",
-    content: "Behind the scenes: Creating 'Digital Dreams' in 30 seconds ✨",
-    time: "5h ago"
+    content:
+      "Behind the scenes: Creating 'Digital Dreams' in 30 seconds ✨",
+    time: "5h ago",
   },
   {
     platform: "YouTube",
-    content: "Producer breakdown: How I made 'Underground Pulse' with just 3 plugins",
-    time: "1d ago"
-  }
+    content:
+      "Producer breakdown: How I made 'Underground Pulse' with just 3 plugins",
+    time: "1d ago",
+  },
 ];
 
 const SocialFooter = () => (
@@ -73,7 +76,8 @@ const SocialFooter = () => (
           Listen Anywhere
         </h2>
         <p className="text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
-          Join the community across all platforms. Connect, share, and discover new sounds together.
+          Join the community across all platforms. Connect, share, and discover
+          new sounds together.
         </p>
 
         {/* Social Icons */}
@@ -86,7 +90,12 @@ const SocialFooter = () => (
               asChild
               className={`border-gray-700 text-black ${social.color} hover:bg-gray-800 transition-all duration-300 group rounded-full px-6 py-3 font-semibold`}
             >
-              <a href={social.url} target="_blank" rel="noopener noreferrer" aria-label={social.name}>
+              <a
+                href={social.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={social.name}
+              >
                 <social.icon className="w-7 h-7 mr-2 group-hover:scale-110 transition-transform" />
                 <span className="hidden sm:inline">{social.name}</span>
               </a>
@@ -97,15 +106,24 @@ const SocialFooter = () => (
 
       {/* Social Feed Preview */}
       <div className="mb-16">
-        <h3 className="text-2xl font-bold text-black mb-8 text-center">Recent Activity</h3>
+        <h3 className="text-2xl font-bold mb-8 text-center bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+          Recent Activity
+        </h3>
         <div className="grid md:grid-cols-3 gap-6">
           {recentActivity.map((activity, index) => (
-            <div key={index} className="bg-gray-900/50 border border-gray-700 rounded-lg p-6 hover:border-gray-600 transition-colors">
+            <div
+              key={index}
+              className="bg-gray-900/50 border border-gray-700 rounded-lg p-6 hover:border-gray-600 transition-colors"
+            >
               <div className="flex items-center justify-between mb-3">
-                <span className="text-cyan-400 font-medium text-sm">{activity.platform}</span>
+                <span className="text-cyan-400 font-medium text-sm">
+                  {activity.platform}
+                </span>
                 <span className="text-gray-500 text-xs">{activity.time}</span>
               </div>
-              <p className="text-gray-300 text-sm leading-relaxed">{activity.content}</p>
+              <p className="text-gray-300 text-sm leading-relaxed">
+                {activity.content}
+              </p>
             </div>
           ))}
         </div>
@@ -115,12 +133,16 @@ const SocialFooter = () => (
       <div className="text-center border-t border-gray-800 pt-8">
         <div className="flex flex-col sm:flex-row justify-between items-center">
           <div className="mb-4 sm:mb-0">
-            <h3 className="text-xl font-bold text-white mb-2">OnkelGashi RADIO</h3>
+            <h3 className="text-xl font-bold text-white mb-2">
+              OnkelGashi RADIO
+            </h3>
             <p className="text-gray-400 text-sm">Where Love meets the future</p>
           </div>
           <div className="text-gray-500 text-sm">
             <p>&copy; 2024 OnkelGashi. All rights reserved.</p>
-            <p className="mt-1">Streaming 24/7 • 400+ Original Tracks</p>
+            <p className="mt-1">
+              Streaming 24/7 • 400+ Original Tracks
+            </p>
           </div>
         </div>
       </div>
