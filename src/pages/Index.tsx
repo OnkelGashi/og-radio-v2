@@ -17,16 +17,21 @@ export default function Index() {
   const [activeGenre, setActiveGenre] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen text-white overflow-hidden transition-all duration-700 relative">
+    <div className="min-h-screen text-white overflow-x-hidden transition-all duration-700 relative">
       {/* Genre-reactive animated background */}
       <GenreBackground genre={activeGenreForTheme} />
 
-      <NowPlaying activeGenre={activeGenre} />
-      <Hero activeGenre={activeGenre} />
-      <AboutSection activeGenre={activeGenre} />
-      <GenreStations activeGenre={activeGenre} setActiveGenre={setActiveGenre} />
-      <PlaylistShowcase activeGenre={activeGenre} />
-      <StreamSchedule activeGenre={activeGenre} />
+      <NowPlaying />
+      <Hero />
+      <AboutSection activeGenre={activeGenreForTheme} />
+
+      {/* Add an ID to this section for scroll targeting */}
+      <div id="genre-stations-section">
+        <GenreStations activeGenre={activeGenre} setActiveGenre={setActiveGenre} />
+      </div>
+
+      <PlaylistShowcase activeGenre={activeGenreForTheme} />
+      <StreamSchedule activeGenre={activeGenreForTheme} />
       <SocialFooter />
     </div>
   );

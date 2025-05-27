@@ -76,7 +76,7 @@ const PlaylistShowcase = ({ activeGenre }: Props) => {
     : playlists.filter(playlist => playlist.mood === activeFilter);
 
   return (
-    <section className={`py-20 px-4 sm:px-6 lg:px-8 relative transition-colors duration-500`}>
+    <section className="py-20 px-4 sm:px-6 lg:px-8 relative transition-colors duration-500">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className={`text-4xl sm:text-5xl font-bold mb-6 transition-colors duration-300 ${
@@ -94,7 +94,7 @@ const PlaylistShowcase = ({ activeGenre }: Props) => {
             Discover collections crafted for every mood and moment. Each playlist tells a unique sonic story.
           </p>
           <div className="flex flex-wrap justify-center gap-3 mb-8">
-            <Filter className="w-5 h-5 text-gray-400 mr-2 self-center" />
+            <Filter className="w-5 h-5 text-gray-400 dark:text-gray-500 mr-2 self-center" />
             {filters.map((filter) => (
               <Button
                 key={filter}
@@ -104,7 +104,7 @@ const PlaylistShowcase = ({ activeGenre }: Props) => {
                 className={`rounded-full transition-all duration-300 ${
                   activeFilter === filter
                     ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white"
-                    : "border-gray-600 text-black hover:bg-gray-800"
+                    : "border-border text-foreground hover:bg-accent hover:text-accent-foreground"
                 }`}
               >
                 {filter}

@@ -21,28 +21,22 @@ const socialLinks = [
     color: "hover:text-red-500",
   },
   {
-    name: "TikTok",
-    icon: TikTokIcon,
-    url: "https://www.tiktok.com/@OnkelGashi",
-    color: "hover:text-black dark:hover:text-white",
-  },
-  {
     name: "Twitch",
     icon: Twitch,
-    url: "https://www.twitch.tv/OnkelGashi",
-    color: "hover:text-purple-400",
+    url: "https://twitch.tv/onkelgashi",
+    color: "hover:text-purple-500",
   },
   {
     name: "Discord",
     icon: MessageCircle,
     url: "https://discord.gg/zsXM4w4B69",
-    color: "hover:text-indigo-300",
+    color: "hover:text-indigo-500",
   },
   {
     name: "Instagram",
     icon: Instagram,
-    url: "https://www.instagram.com/OnkelGashi",
-    color: "hover:text-pink-400",
+    url: "https://instagram.com/onkelgashi",
+    color: "hover:text-pink-500",
   },
 ];
 
@@ -88,7 +82,12 @@ const SocialFooter = () => (
               variant="outline"
               size="lg"
               asChild
-              className={`border-gray-700 text-black ${social.color} hover:bg-gray-800 transition-all duration-300 group rounded-full px-6 py-3 font-semibold`}
+              className={`
+                border-border text-foreground
+                ${social.color}
+                hover:bg-accent
+                transition-all duration-300 group rounded-full px-6 py-3 font-semibold
+              `}
             >
               <a
                 href={social.url}

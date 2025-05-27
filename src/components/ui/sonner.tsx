@@ -1,13 +1,16 @@
-import { useTheme } from "next-themes"
-import { Toaster as Sonner, toast } from "sonner"
+// src/components/ui/sonner.tsx
+import { useTheme } from "next-themes";
+// Import 'Toaster' and 'toast' from the actual 'sonner' library, using aliases to avoid name conflicts
+import { Toaster as SonnerPrimitive, toast as toastFunctionFromSonner } from "sonner";
 
-type ToasterProps = React.ComponentProps<typeof Sonner>
+type ToasterProps = React.ComponentProps<typeof SonnerPrimitive>;
 
-const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme()
+// Your custom Toaster component that wraps SonnerPrimitive
+const ToasterWrapper = ({ ...props }: ToasterProps) => {
+  const { theme = "system" } = useTheme();
 
   return (
-    <Sonner
+    <SonnerPrimitive // Use the aliased import SonnerPrimitive here
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
       toastOptions={{
@@ -23,7 +26,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       {...props}
     />
-  )
-}
+  );
+};
 
-export { Toaster, toast }
+// Export your custom Toaster component as 'Toaster'
+// and the original toast function from sonner as 'toast'
+export { ToasterWrapper as Toaster, toastFunctionFromSonner as toast };

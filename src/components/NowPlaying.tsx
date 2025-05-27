@@ -19,7 +19,7 @@ import {
   Check,
   Radio,
 } from "lucide-react";
-import { useAudioStore, NowPlayingInfo, DEFAULT_TRACK_INFO } from "@/stores/audioStore";
+import { useAudioStore, NowPlayingInfo, EMPTY_NOW_PLAYING_INFO } from "@/stores/audioStore";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -43,7 +43,8 @@ const NowPlaying = () => {
     audioElement,
     isPlaying,
     nowPlayingInfo,
-    togglePlayPause,
+    lastPlayedInfo, // <-- Make sure to get lastPlayedInfo
+    togglePlayPause: togglePlayPauseAction, // Rename for clarity
     volume,
     setVolume,
     playItem,
@@ -52,7 +53,11 @@ const NowPlaying = () => {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [previousVolume, setPreviousVolume] = useState(0.5);
-  const displayInfo = nowPlayingInfo || DEFAULT_TRACK_INFO;
+  
+  // CRITICAL CHANGE HERE:
+  // nowPlayingInfo from the store is guaranteed to be an object (defaults to EMPTY_NOW_PLAYING_INFO).
+  // So, direct assignment is fine.
+  const displayInfo = nowPlayingInfo; 
 
   useEffect(() => {
     if (!audioElement) {
@@ -64,24 +69,33 @@ const NowPlaying = () => {
         setDuration(audioElement.duration || 0);
       }
     };
-    if (audioElement.readyState >= 2 && audioElement.duration) { updateTimes(); }
+    // Check if metadata is already loaded
+    if (audioElement.readyState >= 2 && audioElement.duration && !isNaN(audioElement.duration)) { 
+        updateTimes(); 
+    }
     
     audioElement.addEventListener("timeupdate", updateTimes);
     audioElement.addEventListener("loadedmetadata", updateTimes);
     audioElement.addEventListener("durationchange", updateTimes);
     audioElement.addEventListener("emptied", () => { setProgress(0); setDuration(0); });
-    audioElement.addEventListener("error", (e) => { console.error("NowPlaying: Audio Error", e); setProgress(0); setDuration(0); store.pauseAllAudio(); });
+    audioElement.addEventListener("error", (e) => { 
+        console.error("NowPlaying: Audio Error", e); 
+        setProgress(0); 
+        setDuration(0); 
+        // Consider if store.pauseAllAudio() or store.stopPlayback() should be called on error
+        // store.stopPlayback(); // This would reset UI to "Ready to Play"
+    });
     
     return () => {
       if (audioElement) {
         audioElement.removeEventListener("timeupdate", updateTimes);
         audioElement.removeEventListener("loadedmetadata", updateTimes);
         audioElement.removeEventListener("durationchange", updateTimes);
-        audioElement.removeEventListener("emptied", updateTimes);
-        audioElement.removeEventListener("error", updateTimes);
+        audioElement.removeEventListener("emptied", updateTimes); // Use updateTimes or a reset function
+        audioElement.removeEventListener("error", updateTimes); // Use updateTimes or a reset function
       }
     };
-  }, [audioElement, displayInfo.src, store]);
+  }, [audioElement, displayInfo?.src]); // Depend on displayInfo.src to re-run if track changes
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!audioElement || !duration || isNaN(duration) || duration === 0) return;
@@ -100,13 +114,19 @@ const NowPlaying = () => {
     const checkAlarm = () => {
       if (alarmActive && !alarmTriggered && alarmTime && getTime() === alarmTime) {
         setAlarmActive(false); setAlarmTriggered(true);
-        playItem(DEFAULT_TRACK_INFO);
+        // If WELCOME_AUDIO_INFO is intended for alarm, ensure it's imported or use another track.
+        // For now, it will try to play EMPTY_NOW_PLAYING_INFO if nothing else is defined.
+        // This part might need adjustment based on desired alarm behavior.
+        // Perhaps playItem(WELCOME_AUDIO_INFO) if that's what you want the alarm to trigger.
+        // For now, let's assume the alarm is a separate feature to be fully defined.
+        // store.playItem(EMPTY_NOW_PLAYING_INFO); // Or a specific alarm sound
+        console.log("Alarm triggered!"); // Placeholder for alarm action
         setTimeout(() => setAlarmTriggered(false), 20000);
       }
     };
     const interval = setInterval(checkAlarm, 1000);
     return () => clearInterval(interval);
-  }, [alarmActive, alarmTriggered, alarmTime, playItem]);
+  }, [alarmActive, alarmTriggered, alarmTime, playItem]); // Added playItem to dependency array if it's used in alarm
 
   const formatTime = (seconds: number) => {
     if (isNaN(seconds) || seconds < 0) return "0:00";
@@ -116,8 +136,8 @@ const NowPlaying = () => {
   };
 
   const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(202);
-  const handleLike = () => { setIsLiked((prev) => !prev); setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1)); };
+  // const [likeCount, setLikeCount] = useState(202); // Like count can be managed differently if needed
+  const handleLike = () => { setIsLiked((prev) => !prev); /* setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1)); */ };
   const [showShare, setShowShare] = useState(false);
   const [copied, setCopied] = useState(false);
   const shareUrl = "https://onkelgashi.de";
@@ -142,6 +162,29 @@ const NowPlaying = () => {
     }
   };
 
+  // Ensure displayInfo is always defined before accessing its properties
+  const currentTitle = displayInfo?.title || "Radio";
+  const currentArtistOrContext = displayInfo?.artistOrContext || "Standby";
+  const currentGenre = displayInfo?.genre || "";
+  const currentType = displayInfo?.type || "none";
+
+  // Custom play/pause handler to scroll if nothing is loaded
+  const handleTogglePlayPause = () => {
+    if (
+      !isPlaying &&
+      (nowPlayingInfo?.type === "none" || !nowPlayingInfo?.src) &&
+      !lastPlayedInfo
+    ) {
+      const section = document.getElementById("genre-stations-section");
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+        // Optionally: show a toast here to guide the user
+      }
+    } else {
+      togglePlayPauseAction();
+    }
+  };
+
   return (
     <>
       <div className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm border-b border-gray-800">
@@ -157,23 +200,20 @@ const NowPlaying = () => {
                   max={100}
                   step={1}
                   className={cn("w-[50px] sm:w-[60px] md:w-[100px]")}
-                  trackClassName="bg-gray-800"
-                  rangeClassName={volume === 0 ? "bg-gray-800" : "bg-white"}
-                  thumbClassName={volume === 0 ? "bg-gray-600" : "bg-white"}
                   onValueChange={handleVolumeChange}
                   aria-label="Volume"
                 />
               </div>
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center shrink-0">
-                {displayInfo.type === 'station' ? <Radio className="w-4 h-4 sm:w-5 sm:h-5 text-white" /> : <Music className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
+                {currentType === 'station' ? <Radio className="w-4 h-4 sm:w-5 sm:h-5 text-white" /> : <Music className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
               </div>
               <div className="min-w-0 flex-grow">
                 <h4 className="text-white text-sm md:text-base truncate font-semibold">
-                  {displayInfo.title}
+                  {currentTitle}
                 </h4>
                 <p className="text-gray-400 text-xs truncate">
-                  {displayInfo.artistOrContext}
-                  {displayInfo.genre && ` • ${displayInfo.genre}`}
+                  {currentArtistOrContext}
+                  {currentGenre && ` • ${currentGenre}`}
                 </p>
               </div>
               <div className="flex items-center ml-1 md:ml-3 shrink-0">
@@ -182,7 +222,7 @@ const NowPlaying = () => {
                   LIVE
                 </div>
                 <Button
-                  onClick={togglePlayPause}
+                  onClick={handleTogglePlayPause} // Use the new handler
                   variant="default"
                   size="icon"
                   className="ml-0 bg-blue-600 hover:bg-blue-500 text-white rounded-full p-1 sm:p-2 w-8 h-8 sm:w-auto sm:h-auto"
@@ -203,7 +243,7 @@ const NowPlaying = () => {
                 />
                 <Button
                   onClick={() => { if (alarmTime) { setAlarmActive(true); setAlarmTriggered(false); } }}
-                  size="xs"
+                  size="xs" // Ensure this size is defined or use 'sm'
                   className={`px-1.5 sm:px-2 py-0.5 text-xs rounded-md ml-1 transition-colors ${alarmActive ? "bg-cyan-700 text-white" : "bg-cyan-600 hover:bg-cyan-500 text-white"}`}
                 >
                   {alarmActive ? "Armed" : "Set"}
@@ -264,7 +304,7 @@ const NowPlaying = () => {
 function CurrentTime() {
   const [now, setNow] = useState(() => { const d = new Date(); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; });
   useEffect(() => {
-    const timer = setInterval(() => { const d = new Date(); setNow(`${pad(d.getHours())}:${pad(d.getMinutes())}`); }, 5000);
+    const timer = setInterval(() => { const d = new Date(); setNow(`${pad(d.getHours())}:${pad(d.getMinutes())}`); }, 5000); // Update every 5 seconds
     return () => clearInterval(timer);
   }, []);
   return <span suppressHydrationWarning>{now}</span>;

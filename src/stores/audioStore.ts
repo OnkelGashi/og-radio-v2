@@ -1,13 +1,15 @@
 // src/stores/audioStore.ts
+// (This is the refined code from the previous response - ensure this is in place)
 import { create } from 'zustand';
+import { toast } from "@/components/ui/sonner";
 
 export interface NowPlayingInfo {
   id: string;
-  type: 'track' | 'station' | 'playlist' | 'welcome';
+  type: 'track' | 'station' | 'playlist' | 'welcome' | 'none';
   src: string;
   title: string;
   artistOrContext: string;
-  genre: string | null;
+  genre: string | null; // Should be the genre ID, e.g., "hip-hop"
   artwork?: string;
 }
 
@@ -15,6 +17,7 @@ interface AudioState {
   audioElement: HTMLAudioElement | null;
   isPlaying: boolean;
   nowPlayingInfo: NowPlayingInfo | null;
+  lastPlayedInfo: NowPlayingInfo | null;
   isWelcomeAudioPlaying: boolean;
   volume: number;
   activeGenreForTheme: string | null;
@@ -26,9 +29,9 @@ interface AudioState {
   pauseAllAudio: () => void;
   setVolume: (volume: number) => void;
   setActiveGenreForTheme: (genre: string | null) => void;
+  stopPlayback: () => void;
 }
 
-// Corrected paths based on your public folder structure:
 export const WELCOME_AUDIO_INFO: NowPlayingInfo = {
   id: 'welcome_track',
   type: 'welcome',
@@ -38,25 +41,25 @@ export const WELCOME_AUDIO_INFO: NowPlayingInfo = {
   genre: null,
 };
 
-export const DEFAULT_TRACK_INFO: NowPlayingInfo = {
-  id: 'default_track_faded_frequencies',
-  type: 'track',
-  src: "/audio/default/faded-frequencies.mp3",
-  title: "Faded Frequencies",
-  artistOrContext: "OnkelGashi",
-  genre: "Future Bass",
+export const EMPTY_NOW_PLAYING_INFO: NowPlayingInfo = {
+  id: 'empty_state',
+  type: 'none',
+  src: "",
+  title: "Ready to Play",
+  artistOrContext: "Select a station or track",
+  genre: null,
 };
 
 export const useAudioStore = create<AudioState>((set, get) => ({
   audioElement: null,
   isPlaying: false,
-  nowPlayingInfo: null,
+  nowPlayingInfo: EMPTY_NOW_PLAYING_INFO,
+  lastPlayedInfo: null,
   isWelcomeAudioPlaying: false,
   volume: 1,
   activeGenreForTheme: null,
 
   setAudioElement: (element) => {
-    console.log("AudioStore: Setting audioElement", element);
     const { volume } = get();
     if (element) {
       element.volume = volume;
@@ -64,33 +67,56 @@ export const useAudioStore = create<AudioState>((set, get) => ({
     set({ audioElement: element });
   },
 
-  setActiveGenreForTheme: (genre) => {
-    console.log("AudioStore: Setting activeGenreForTheme", genre);
-    set({ activeGenreForTheme: genre });
+  setActiveGenreForTheme: (genreId) => {
+    set({ activeGenreForTheme: genreId });
+  },
+
+  stopPlayback: () => {
+    const { audioElement, setActiveGenreForTheme } = get();
+    if (audioElement && !audioElement.paused) {
+      audioElement.pause();
+    }
+    set({
+      isPlaying: false,
+      isWelcomeAudioPlaying: false,
+      nowPlayingInfo: EMPTY_NOW_PLAYING_INFO,
+      // lastPlayedInfo is NOT cleared, so resume is possible
+    });
+    setActiveGenreForTheme(null); // Reset theme to default
   },
 
   playItem: (itemInfo) => {
-    console.log("AudioStore: playItem called with:", itemInfo);
-    const { audioElement, volume, setActiveGenreForTheme, nowPlayingInfo: currentItem } = get();
+    const { audioElement, volume, setActiveGenreForTheme, stopPlayback } = get();
 
-    if (!audioElement) {
-      console.error("AudioStore: audioElement is null in playItem. Cannot play.");
-      set({
-        nowPlayingInfo: itemInfo,
-        isPlaying: true,
-        isWelcomeAudioPlaying: itemInfo.type === 'welcome',
-        activeGenreForTheme: itemInfo.genre
-      });
+    if (!itemInfo || !itemInfo.src || typeof itemInfo.src !== 'string' || itemInfo.src.trim() === "") {
+      // toast({ title: "Playback Error", description: `Cannot play "${itemInfo?.title || 'Unknown Track'}". Audio source is missing.`, variant: "destructive" });
+      if (get().nowPlayingInfo?.id === itemInfo?.id) {
+        set({ nowPlayingInfo: EMPTY_NOW_PLAYING_INFO, isPlaying: false });
+      } else {
+        set({ isPlaying: false });
+      }
+      setActiveGenreForTheme(null);
       return;
     }
 
-    console.log(`AudioStore: Preparing to play ${itemInfo.title} (src: ${itemInfo.src})`);
+    if (!audioElement) {
+      set({
+        nowPlayingInfo: itemInfo,
+        isPlaying: itemInfo.type !== 'none',
+        isWelcomeAudioPlaying: itemInfo.type === 'welcome',
+        lastPlayedInfo: itemInfo.type !== 'welcome' && itemInfo.type !== 'none' ? itemInfo : get().lastPlayedInfo,
+      });
+      setActiveGenreForTheme(itemInfo.genre);
+      return;
+    }
+
     audioElement.pause();
 
     set({
       nowPlayingInfo: itemInfo,
       isPlaying: false,
       isWelcomeAudioPlaying: itemInfo.type === 'welcome',
+      lastPlayedInfo: itemInfo.type !== 'welcome' && itemInfo.type !== 'none' ? itemInfo : get().lastPlayedInfo,
     });
     setActiveGenreForTheme(itemInfo.genre);
 
@@ -102,60 +128,70 @@ export const useAudioStore = create<AudioState>((set, get) => ({
 
     if (playPromise !== undefined) {
       playPromise.then(() => {
-        console.log(`AudioStore: Playback started successfully for: ${itemInfo.title}`);
-        set({ isPlaying: true });
-
-        if (itemInfo.type === 'welcome') {
-          console.log("AudioStore: Welcome audio playing, setting up onended for default track.");
-          audioElement.onended = () => {
-            console.log("AudioStore: Welcome audio ended. Playing default track.");
-            if (audioElement) audioElement.onended = null;
-            get().playItem(DEFAULT_TRACK_INFO);
-          };
+        if (get().nowPlayingInfo?.id === itemInfo.id) {
+          set({ isPlaying: true });
+        } else {
+          audioElement.pause();
+          return;
         }
+
+        const handleEnd = () => {
+          if (get().nowPlayingInfo?.id === itemInfo.id) {
+            stopPlayback();
+          }
+        };
+        audioElement.onended = handleEnd;
+
       }).catch(error => {
-        console.error(`AudioStore: Error playing ${itemInfo.title} (src: ${itemInfo.src}):`, error);
-        set({ isPlaying: false, isWelcomeAudioPlaying: false, nowPlayingInfo: currentItem });
+        if (get().nowPlayingInfo?.id === itemInfo.id) {
+          set({ isPlaying: false, isWelcomeAudioPlaying: false, nowPlayingInfo: EMPTY_NOW_PLAYING_INFO });
+        }
+        setActiveGenreForTheme(null);
+        toast("Playback Error", {
+          description: "Could not play this track.",
+          className: "bg-red-900 text-white"
+        });
       });
     } else {
-      console.warn("AudioStore: audioElement.play() did not return a promise.");
-      set({ isPlaying: true });
-      if (itemInfo.type === 'welcome') {
-        audioElement.onended = () => {
-          if (audioElement) audioElement.onended = null;
-          get().playItem(DEFAULT_TRACK_INFO);
+      // Legacy browser fallback
+      if (get().nowPlayingInfo?.id === itemInfo.id) {
+        set({ isPlaying: true });
+        const handleEndLegacy = () => {
+          if (get().nowPlayingInfo?.id === itemInfo.id) {
+            if (audioElement) audioElement.onended = null;
+            stopPlayback();
+          }
         };
+        audioElement.onended = handleEndLegacy;
       }
     }
   },
 
   playWelcomeAndThenDefault: () => {
-    console.log("AudioStore: playWelcomeAndThenDefault called");
     get().playItem(WELCOME_AUDIO_INFO);
   },
 
   pauseAllAudio: () => {
-    console.log("AudioStore: pauseAllAudio called");
     const { audioElement } = get();
     if (audioElement && !audioElement.paused) {
       audioElement.pause();
     }
-    set({ isPlaying: false, isWelcomeAudioPlaying: false });
+    set({ isPlaying: false });
+    // Do not reset theme or nowPlayingInfo here, so resume is possible
   },
 
   togglePlayPause: () => {
-    const { isPlaying, nowPlayingInfo, playItem, pauseAllAudio } = get();
-    console.log("AudioStore: togglePlayPause called. isPlaying:", isPlaying, "nowPlayingInfo:", nowPlayingInfo);
+    const { isPlaying, nowPlayingInfo, playItem, pauseAllAudio, lastPlayedInfo } = get();
 
     if (isPlaying) {
       pauseAllAudio();
     } else {
-      if (nowPlayingInfo && nowPlayingInfo.src) {
-        console.log("AudioStore: Resuming/Starting item:", nowPlayingInfo);
+      if (nowPlayingInfo && nowPlayingInfo.type !== 'none' && nowPlayingInfo.src) {
         playItem(nowPlayingInfo);
+      } else if (lastPlayedInfo && lastPlayedInfo.src) {
+        playItem(lastPlayedInfo);
       } else {
-        console.log("AudioStore: No current item, playing default track.");
-        playItem(DEFAULT_TRACK_INFO);
+        // Optionally, show a toast or scroll to stations
       }
     }
   },
@@ -167,6 +203,5 @@ export const useAudioStore = create<AudioState>((set, get) => ({
       audioElement.volume = newVolume;
     }
     set({ volume: newVolume });
-    console.log("AudioStore: Volume set to", newVolume);
   },
 }));

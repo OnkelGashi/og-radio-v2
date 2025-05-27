@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Play, Radio, Zap, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,37 +7,26 @@ import { useAudioStore } from "@/stores/audioStore";
 const getHeadingTextColorClass = (genre: string | null) => "text-gray-200";
 const getBodyTextColorClass = (genre: string | null) => "text-gray-200";
 
-const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isPlayingWelcome, setIsPlayingWelcome] = useState(false);
+const Hero = () => {
   const [showEnterScreen, setShowEnterScreen] = useState(true);
-  const playWelcomeAndThenMain = useAudioStore((s) => s.playWelcomeAndThenMain);
-  const playWelcomeAndThenDefault = useAudioStore((state) => state.playWelcomeAndThenDefault);
+  const playWelcomeAudio = useAudioStore((state) => state.playWelcomeAndThenDefault);
 
   const handleEnterRadio = () => {
     setShowEnterScreen(false);
-    playWelcomeAndThenDefault();
+    playWelcomeAudio();
   };
 
-  useEffect(() => {
-    const currentAudio = audioRef.current;
-    const handleAudioEnd = () => {
-      setIsPlayingWelcome(false);
-    };
-
-    if (currentAudio) {
-      currentAudio.addEventListener("ended", handleAudioEnd);
+  // Scroll to GenreStations section
+  const scrollToGenreStations = () => {
+    const section = document.getElementById('genre-stations-section');
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    return () => {
-      if (currentAudio) {
-        currentAudio.removeEventListener("ended", handleAudioEnd);
-      }
-    };
-  }, []);
+  };
 
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden">
-      <audio ref={audioRef} src="/Welcome.mp3" preload="auto" />
+      {/* No local <audio> tag or audioRef here! */}
 
       {showEnterScreen && (
         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md transition-opacity duration-500 ease-in-out">
@@ -75,7 +64,6 @@ const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
           showEnterScreen ? "opacity-0 pointer-events-none absolute" : "opacity-100 relative"
         }`}
       >
-        {/* THIS IS THE CHANGED LINE: */}
         <div className="absolute inset-0 bg-gradient-radial from-blue-900/70 via-indigo-950/50 to-[#0d1117] -z-10"></div>
         
         <div className="absolute inset-0 pointer-events-none -z-20">
@@ -98,26 +86,24 @@ const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
         <div className="absolute -bottom-16 left-0 right-0 h-20 opacity-75 -z-10 pointer-events-none">
           <div className="flex items-end justify-center space-x-1.5 h-full">
             {[...Array(35)].map((_, i) => {
-              // Create a symmetric effect, peaking in the middle
               const distanceFromCenter = Math.abs(i - Math.floor(35 / 2));
-              const maxPeakHeight = 80; // Max height in %
-              const minPeakHeight = 20; // Min height in %
-              const peakinessFactor = Math.max(0, 1 - (distanceFromCenter / (35 / 2)) * 0.8); // Sharper peak
+              const maxPeakHeight = 80; 
+              const minPeakHeight = 20; 
+              const peakinessFactor = Math.max(0, 1 - (distanceFromCenter / (35 / 2)) * 0.8); 
 
-              const baseHeight = minPeakHeight + (maxPeakHeight - minPeakHeight) * peakinessFactor * 0.5; // Base height influenced by position
+              const baseHeight = minPeakHeight + (maxPeakHeight - minPeakHeight) * peakinessFactor * 0.5; 
               const randomHeightFactor = Math.random() * (maxPeakHeight * 0.5 * peakinessFactor);
 
               return (
                 <div
                   key={`wave-${i}`}
-                  // Changed gradient to match button, adjust as needed
                   className="bg-gradient-to-t from-purple-600 to-pink-500 rounded-t" 
                   style={{
-                    width: "4px", // Thicker bars
-                    height: `${baseHeight + randomHeightFactor}%`, // Adjusted height logic
-                    animationName: 'wavePulse', // Using custom animation name
-                    animationDuration: `${1 + Math.random() * 0.5}s`, // Slightly more uniform duration
-                    animationDelay: `${distanceFromCenter * 0.05 + Math.random() * 0.1}s`, // Delay based on distance from center for a ripple/peak effect
+                    width: "4px", 
+                    height: `${baseHeight + randomHeightFactor}%`, 
+                    animationName: 'wavePulse', 
+                    animationDuration: `${1 + Math.random() * 0.5}s`, 
+                    animationDelay: `${distanceFromCenter * 0.05 + Math.random() * 0.1}s`, 
                     animationIterationCount: 'infinite',
                     animationTimingFunction: 'ease-in-out',
                     animationDirection: 'alternate',
@@ -129,59 +115,62 @@ const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
         </div>
 
         <div className="relative z-20 text-center max-w-4xl mx-auto">
-            <div className="flex justify-center mb-6">
-              <Badge className="bg-red-600/20 text-red-400 border-red-500/30 px-4 py-2 text-sm font-medium">
-                <div className="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></div>
-                LIVE NOW
-              </Badge>
+          <div className="flex justify-center mb-6">
+            <Badge className="bg-red-600/20 text-red-400 border-red-500/30 px-4 py-2 text-sm font-medium">
+              <div className="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></div>
+              LIVE NOW
+            </Badge>
+          </div>
+          <h1 className={`text-8xl sm:text-9xl font-black mb-2 bg-gradient-to-r from-[#b180fc] via-blue-300 to-cyan-400 bg-clip-text text-transparent drop-shadow-xl tracking-wide`}>
+            OnkelGashi
+          </h1>
+          <h2 className={`text-7xl sm:text-8xl font-black mb-8 bg-gradient-to-l from-cyan-400 to-purple-400 bg-clip-text text-transparent drop-shadow-xl tracking-wide`}>
+            Radio
+          </h2>
+          <div className="flex items-center justify-center mb-4">
+            <Radio className="w-6 h-6 text-cyan-400 mr-3" />
+            <span className={`text-2xl sm:text-3xl lg:text-4xl font-light tracking-widest ${getHeadingTextColorClass(null)}`}>
+              Sound for Hyperactive Minds & True Creators
+            </span>
+          </div>
+          <p className={`text-xl sm:text-2xl mb-8 max-w-2xl mx-auto leading-relaxed ${getBodyTextColorClass(null)}`}>
+            Enter a living digital soundscape—always genre-bending, always evolving.<br />
+            <span className="text-cyan-300 font-bold">400+</span> tracks designed for restless focus, deep feels, and creative flow—streaming nonstop from the OG multiverse.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+            <Button
+              onClick={scrollToGenreStations}
+              size="lg"
+              className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl hover:shadow-blue-500/25 animate-pulse"
+            >
+              <Play className="w-6 h-6 mr-2 group-hover:scale-110 transition-transform" />
+              Tune In Live
+            </Button>
+            <Button
+              onClick={scrollToGenreStations}
+              variant="outline"
+              size="lg"
+              className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white px-8 py-4 rounded-full text-lg transition-all duration-300"
+            >
+              <Zap className="w-5 h-5 mr-2" />
+              Explore Catalog
+            </Button>
+          </div>
+          <div className="grid grid-cols-3 gap-8 max-w-md mx-auto text-center -mt-12">
+            <div>
+              <div className="text-2xl font-bold text-cyan-400">400+</div>
+              <div className="text-sm text-gray-400">Tracks</div>
             </div>
-            <h1 className={`text-8xl sm:text-9xl font-black mb-2 bg-gradient-to-r from-[#b180fc] via-blue-300 to-cyan-400 bg-clip-text text-transparent drop-shadow-xl tracking-wide`}>
-              OnkelGashi
-            </h1>
-            <h2 className={`text-7xl sm:text-8xl font-black mb-8 bg-gradient-to-l from-cyan-400 to-purple-400 bg-clip-text text-transparent drop-shadow-xl tracking-wide`}>
-              Radio
-            </h2>
-            <div className="flex items-center justify-center mb-4">
-              <Radio className="w-6 h-6 text-cyan-400 mr-3" />
-              <span className={`text-2xl sm:text-3xl lg:text-4xl font-light tracking-widest ${getHeadingTextColorClass(activeGenre || null)}`}>
-                Sound for Hyperactive Minds & True Creators
-              </span>
+            <div>
+              <div className="text-2xl font-bold text-purple-400">24/7</div>
+              <div className="text-sm text-gray-400">Live Stream</div>
             </div>
-            <p className={`text-xl sm:text-2xl mb-8 max-w-2xl mx-auto leading-relaxed ${getBodyTextColorClass(activeGenre || null)}`}>
-              Enter a living digital soundscape—always genre-bending, always evolving.<br />
-              <span className="text-cyan-300 font-bold">400+</span> tracks designed for restless focus, deep feels, and creative flow—streaming nonstop from the OG multiverse.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <Button
-                size="lg"
-                className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl hover:shadow-blue-500/25 animate-pulse"
-              >
-                <Play className="w-6 h-6 mr-2 group-hover:scale-110 transition-transform" />
-                Tune In Live
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white px-8 py-4 rounded-full text-lg transition-all duration-300"
-              >
-                <Zap className="w-5 h-5 mr-2" />
-                Explore Catalog
-              </Button>
+            <div>
+              <div className="text-2xl font-bold text-blue-400">5+</div>
+              <div className="text-sm text-gray-400">Genres</div>
             </div>
-            <div className="grid grid-cols-3 gap-8 max-w-md mx-auto text-center -mt-12">
-              <div>
-                <div className="text-2xl font-bold text-cyan-400">400+</div>
-                <div className="text-sm text-gray-400">Tracks</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-purple-400">24/7</div>
-                <div className="text-sm text-gray-400">Live Stream</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-blue-400">5+</div>
-                <div className="text-sm text-gray-400">Genres</div>
-              </div>
-            </div>
+          </div>
         </div>
       </div>
     </section>

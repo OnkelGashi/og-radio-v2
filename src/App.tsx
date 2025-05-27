@@ -1,5 +1,5 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { ThemeProvider } from "next-themes"; // 1. Import ThemeProvider
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -20,11 +20,11 @@ const App = () => {
   }, [setAudioElement]);
 
   return (
-    <>
+    // 2. Wrap your application with ThemeProvider
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
+          <SonnerToaster />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
@@ -35,7 +35,7 @@ const App = () => {
           <audio ref={audioRef} preload="auto" />
         </TooltipProvider>
       </QueryClientProvider>
-    </>
+    </ThemeProvider>
   );
 };
 
