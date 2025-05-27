@@ -3,6 +3,7 @@ import { Disc, Radio, PlayCircle, PauseCircle, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { useAudioStore, NowPlayingInfo } from "@/stores/audioStore";
 
 // --- 1. GENRE COLORS FOR AUTO TEXT CONTRAST ---
 const genreColors = {
@@ -27,7 +28,7 @@ const genreStations = [
     color: "from-yellow-600 to-amber-600",
     description: "Fresh beats and lyrical mastery from underground to mainstream",
     stations: [
-      { id: "hh1", name: "Urban Beats", listeners: 238, isLive: true },
+      { id: "hh1", name: "Urban Beats", src: "/audio/stations/hiphop_urban_beats.mp3", genre: "Hip Hop", listeners: 238, isLive: true },
       { id: "hh2", name: "Lyrical Flow", listeners: 174, isLive: false },
       { id: "hh3", name: "Classic Hip Hop", listeners: 202, isLive: true },
       { id: "hh4", name: "Trap Nation", listeners: 312, isLive: true },
@@ -150,14 +151,24 @@ type Props = {
 };
 
 const GenreStations = ({ activeGenre, setActiveGenre }: Props) => {
+  const { playItem, nowPlayingInfo, isPlaying, activeGenreForTheme, setActiveGenreForTheme } = useAudioStore();
   const [playingStation, setPlayingStation] = useState<string | null>(null);
 
   // 4. Get current genre and text color
   const currentGenre = genreStations.find((g) => g.id === activeGenre) || genreStations[0];
   const genreTextClass = genreColors[activeGenre || "default"].text;
 
-  const handleStationPlay = (stationId: string) => {
-    setPlayingStation(playingStation === stationId ? null : stationId);
+  const handleStationPlay = (station: any, genreName: string) => {
+    const itemToPlay: NowPlayingInfo = {
+      id: `station_${station.id}`,
+      type: 'station',
+      src: station.src,
+      title: station.name,
+      artistOrContext: genreName,
+      genre: station.genre,
+    };
+    playItem(itemToPlay);
+    setPlayingStation(playingStation === station.id ? null : station.id);
   };
 
   return (
@@ -231,7 +242,7 @@ const GenreStations = ({ activeGenre, setActiveGenre }: Props) => {
                   </div>
                 </div>
                 <Button
-                  onClick={() => handleStationPlay(station.id)}
+                  onClick={() => handleStationPlay(station, currentGenre.name)}
                   size="sm"
                   className={`rounded-full shadow-md
                     ${playingStation === station.id

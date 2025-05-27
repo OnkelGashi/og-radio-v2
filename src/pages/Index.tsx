@@ -8,16 +8,18 @@ import NowPlaying from "@/components/NowPlaying";
 import StreamSchedule from "@/components/StreamSchedule";
 import SocialFooter from "@/components/SocialFooter";
 import GenreStations from "@/components/GenreStations";
+import { useAudioStore } from "@/stores/audioStore";
 import GenreBackground from "@/components/GenreBackground";
 import { useState } from "react";
 
 export default function Index() {
+  const { activeGenreForTheme } = useAudioStore();
   const [activeGenre, setActiveGenre] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen text-white overflow-hidden transition-all duration-700 relative">
       {/* Genre-reactive animated background */}
-      <GenreBackground genre={activeGenre} />
+      <GenreBackground genre={activeGenreForTheme} />
 
       <NowPlaying activeGenre={activeGenre} />
       <Hero activeGenre={activeGenre} />

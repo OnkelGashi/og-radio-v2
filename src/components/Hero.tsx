@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Play, Radio, Zap, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useAudioStore } from "@/stores/audioStore";
 
 const getHeadingTextColorClass = (genre: string | null) => "text-gray-200";
 const getBodyTextColorClass = (genre: string | null) => "text-gray-200";
@@ -10,20 +11,12 @@ const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlayingWelcome, setIsPlayingWelcome] = useState(false);
   const [showEnterScreen, setShowEnterScreen] = useState(true);
+  const playWelcomeAndThenMain = useAudioStore((s) => s.playWelcomeAndThenMain);
+  const playWelcomeAndThenDefault = useAudioStore((state) => state.playWelcomeAndThenDefault);
 
   const handleEnterRadio = () => {
     setShowEnterScreen(false);
-    if (audioRef.current) {
-      audioRef.current
-        .play()
-        .then(() => {
-          setIsPlayingWelcome(true);
-        })
-        .catch((error) => {
-          console.error("Welcome audio play failed after interaction:", error);
-          setIsPlayingWelcome(false);
-        });
-    }
+    playWelcomeAndThenDefault();
   };
 
   useEffect(() => {
