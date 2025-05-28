@@ -21,6 +21,7 @@ interface AudioState {
   isWelcomeAudioPlaying: boolean;
   volume: number;
   activeGenreForTheme: string | null;
+  isVisualizerOpen: boolean;
 
   setAudioElement: (element: HTMLAudioElement) => void;
   playItem: (itemInfo: NowPlayingInfo) => void;
@@ -30,6 +31,7 @@ interface AudioState {
   setVolume: (volume: number) => void;
   setActiveGenreForTheme: (genre: string | null) => void;
   stopPlayback: () => void;
+  setIsVisualizerOpen: (isOpen: boolean) => void;
 }
 
 export const WELCOME_AUDIO_INFO: NowPlayingInfo = {
@@ -58,6 +60,7 @@ export const useAudioStore = create<AudioState>((set, get) => ({
   isWelcomeAudioPlaying: false,
   volume: 1,
   activeGenreForTheme: null,
+  isVisualizerOpen: false,
 
   setAudioElement: (element) => {
     const { volume } = get();
@@ -89,7 +92,6 @@ export const useAudioStore = create<AudioState>((set, get) => ({
     const { audioElement, volume, setActiveGenreForTheme, stopPlayback } = get();
 
     if (!itemInfo || !itemInfo.src || typeof itemInfo.src !== 'string' || itemInfo.src.trim() === "") {
-      // toast({ title: "Playback Error", description: `Cannot play "${itemInfo?.title || 'Unknown Track'}". Audio source is missing.`, variant: "destructive" });
       if (get().nowPlayingInfo?.id === itemInfo?.id) {
         set({ nowPlayingInfo: EMPTY_NOW_PLAYING_INFO, isPlaying: false });
       } else {
@@ -181,13 +183,21 @@ export const useAudioStore = create<AudioState>((set, get) => ({
   },
 
   togglePlayPause: () => {
-    const { isPlaying, nowPlayingInfo, playItem, pauseAllAudio, lastPlayedInfo } = get();
+    const { isPlaying, audioElement, nowPlayingInfo, pauseAllAudio, lastPlayedInfo, playItem } = get();
 
     if (isPlaying) {
       pauseAllAudio();
     } else {
-      if (nowPlayingInfo && nowPlayingInfo.type !== 'none' && nowPlayingInfo.src) {
-        playItem(nowPlayingInfo);
+      // Only resume if audioElement is loaded and src matches nowPlayingInfo
+      if (
+        audioElement &&
+        nowPlayingInfo &&
+        nowPlayingInfo.type !== 'none' &&
+        nowPlayingInfo.src &&
+        audioElement.src.includes(nowPlayingInfo.src)
+      ) {
+        audioElement.play();
+        set({ isPlaying: true });
       } else if (lastPlayedInfo && lastPlayedInfo.src) {
         playItem(lastPlayedInfo);
       } else {
@@ -204,4 +214,8 @@ export const useAudioStore = create<AudioState>((set, get) => ({
     }
     set({ volume: newVolume });
   },
+
+  setIsVisualizerOpen: (isOpen) => set({ isVisualizerOpen: isOpen }),
 }));
+
+// No hook calls outside components!

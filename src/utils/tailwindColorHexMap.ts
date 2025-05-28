@@ -1,0 +1,20 @@
+export const tailwindColorHexMap: Record<string, string> = {
+  "yellow-600": "#ca8a04",
+  "amber-600": "#d97706",
+  "green-600": "#16a34a",
+  "emerald-600": "#059669",
+  "blue-600": "#2563eb",
+  "cyan-600": "#0891b2",
+  "purple-600": "#9333ea",
+  "indigo-600": "#4f46e5",
+  "rose-600": "#e11d48",
+  "pink-600": "#db2777",
+  "teal-600": "#0d9488",
+  "sky-600": "#0284c7",
+  "amber-600": "#d97706",
+  "red-600": "#dc2626",
+  "violet-600": "#7c3aed",
+  "fuchsia-600": "#c026d3",
+  "orange-600": "#ea580c",
+  // Add all other shades you use
+};

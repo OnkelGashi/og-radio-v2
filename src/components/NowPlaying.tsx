@@ -23,6 +23,7 @@ import { useAudioStore, NowPlayingInfo, EMPTY_NOW_PLAYING_INFO } from "@/stores/
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { toast } from "@/components/ui/sonner"; // Make sure this is imported
 
 const shareLinks = [
   { name: "WhatsApp", icon: MessageCircle, color: "bg-green-500/10 text-green-500", url: "https://wa.me/?text=https://onkelgashi.de" },
@@ -112,21 +113,35 @@ const NowPlaying = () => {
   
   useEffect(() => {
     const checkAlarm = () => {
-      if (alarmActive && !alarmTriggered && alarmTime && getTime() === alarmTime) {
-        setAlarmActive(false); setAlarmTriggered(true);
-        // If WELCOME_AUDIO_INFO is intended for alarm, ensure it's imported or use another track.
-        // For now, it will try to play EMPTY_NOW_PLAYING_INFO if nothing else is defined.
-        // This part might need adjustment based on desired alarm behavior.
-        // Perhaps playItem(WELCOME_AUDIO_INFO) if that's what you want the alarm to trigger.
-        // For now, let's assume the alarm is a separate feature to be fully defined.
-        // store.playItem(EMPTY_NOW_PLAYING_INFO); // Or a specific alarm sound
-        console.log("Alarm triggered!"); // Placeholder for alarm action
-        setTimeout(() => setAlarmTriggered(false), 20000);
+      // Current time in HH:MM, e.g., "15:07"
+      const currentTime = new Date().toLocaleTimeString("de-DE", { hour: '2-digit', minute: '2-digit' });
+
+      // Alarm fires only if set, not already triggered, and time matches
+      if (alarmActive && !alarmTriggered && alarmTime === currentTime) {
+        setAlarmActive(false);
+        setAlarmTriggered(true);
+
+        if (lastPlayedInfo && lastPlayedInfo.src) {
+          playItem(lastPlayedInfo);
+          toast("Alarm Triggered!", {
+            description: `Resuming "${lastPlayedInfo.title}".`,
+            className: "bg-green-500 text-white"
+          });
+        } else {
+          toast("Alarm Trigger Failed", {
+            description: "No recent station or track found.",
+            className: "bg-red-500 text-white"
+          });
+        }
+
+        // Allow alarm to be used again after 60 seconds
+        setTimeout(() => setAlarmTriggered(false), 60000);
       }
     };
+
     const interval = setInterval(checkAlarm, 1000);
     return () => clearInterval(interval);
-  }, [alarmActive, alarmTriggered, alarmTime, playItem]); // Added playItem to dependency array if it's used in alarm
+  }, [alarmActive, alarmTriggered, alarmTime, lastPlayedInfo, playItem]);
 
   const formatTime = (seconds: number) => {
     if (isNaN(seconds) || seconds < 0) return "0:00";
@@ -242,8 +257,27 @@ const NowPlaying = () => {
                   style={{ minWidth: 70 }} title="Alarm Timer"
                 />
                 <Button
-                  onClick={() => { if (alarmTime) { setAlarmActive(true); setAlarmTriggered(false); } }}
-                  size="xs" // Ensure this size is defined or use 'sm'
+                  onClick={() => {
+                    if (!alarmTime) return; // Don't do anything if no time selected
+
+                    if (!lastPlayedInfo || !lastPlayedInfo.src) {
+                      // Show toast or popup message
+                      toast("Choose Your WakeupMusic!", {
+                        description: "Bitte wähle zuerst einen Sender oder Track aus.",
+                        className: "bg-yellow-500 text-black"
+                      });
+                      // Scroll to genre stations section
+                      const section = document.getElementById("genre-stations-section");
+                      if (section) {
+                        section.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }
+                      return; // Prevent arming the alarm
+                    }
+
+                    setAlarmActive(true);
+                    setAlarmTriggered(false);
+                  }}
+                  size="xs"
                   className={`px-1.5 sm:px-2 py-0.5 text-xs rounded-md ml-1 transition-colors ${alarmActive ? "bg-cyan-700 text-white" : "bg-cyan-600 hover:bg-cyan-500 text-white"}`}
                 >
                   {alarmActive ? "Armed" : "Set"}

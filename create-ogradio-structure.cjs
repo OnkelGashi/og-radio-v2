@@ -4,8 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 // Mock function for text colors
-const getHeadingTextColorClass = (genre: string | null) => "text-gray-200";
-const getBodyTextColorClass = (genre: string | null) => "text-gray-200";
 
 const Hero = ({ activeGenre }: { activeGenre?: string | null }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);

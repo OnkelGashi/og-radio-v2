@@ -71,7 +71,6 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
               <rect x="660" y="180" width="60" height="120" fill="#23243a" />
               <rect x="900" y="110" width="90" height="190" fill="#1a1c28" />
               <rect x="1100" y="170" width="80" height="130" fill="#23243a" />
-              {/* Add more for a city look */}
             </g>
           </svg>
           {/* Graffiti Glow */}
@@ -386,6 +385,14 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
             }
             `}
           </style>
+          {/* SVG glitch overlay */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none z-10 animate-spin-slow">
+            <filter id="glitch" x="0" y="0">
+              <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="2" result="turb"/>
+              <feDisplacementMap in2="turb" in="SourceGraphic" scale="20" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+            <rect width="100%" height="100%" fill="transparent" filter="url(#glitch)" />
+          </svg>
         </div>
       );
 

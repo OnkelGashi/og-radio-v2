@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect, useRef } from "react";
+import VisualizerDialog from "@/components/VisualizerDialog";
 import { useAudioStore } from "@/stores/audioStore";
 
 import Index from "./pages/Index";
@@ -14,6 +15,8 @@ const queryClient = new QueryClient();
 const App = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const setAudioElement = useAudioStore((s) => s.setAudioElement);
+  const isVisualizerOpen = useAudioStore((s) => s.isVisualizerOpen);
+  const setIsVisualizerOpen = useAudioStore((s) => s.setIsVisualizerOpen);
 
   useEffect(() => {
     if (audioRef.current) setAudioElement(audioRef.current);
@@ -33,6 +36,10 @@ const App = () => {
             </Routes>
           </BrowserRouter>
           <audio ref={audioRef} preload="auto" />
+          <VisualizerDialog
+            isOpen={isVisualizerOpen}
+            onClose={() => setIsVisualizerOpen(false)}
+          />
         </TooltipProvider>
       </QueryClientProvider>
     </ThemeProvider>

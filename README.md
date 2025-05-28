@@ -1,95 +1,145 @@
 # OnkelGashi Radio
 
-Welcome to the OnkelGashi Radio project! This is a web-based radio station application designed to deliver a unique audio experience.
+OnkelGashi Radio is a modern, web-based radio station application that streams a curated selection of genre-bending tracks. Built with React, TypeScript, Vite, and Tailwind CSS, it offers a visually engaging and interactive audio experience.
 
-## Project Setup & Local Development
+---
 
-To get this project up and running on your local machine, follow these steps.
+## Table of Contents
 
-**Prerequisites:**
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Folder Structure](#folder-structure)
+- [Technologies Used](#technologies-used)
+- [Setup & Local Development](#setup--local-development)
+- [Building for Production](#building-for-production)
+- [Deployment](#deployment)
+- [Custom Domain](#custom-domain)
+- [Contributing](#contributing)
+- [License](#license)
 
-* Node.js (LTS version recommended)
-* npm (comes with Node.js) or yarn
+---
 
-You can use [nvm (Node Version Manager)](https://github.com/nvm-sh/nvm#installing-and-updating) to manage Node.js versions.
+## Project Overview
 
-**Installation & Running Locally:**
+OnkelGashi Radio delivers a unique digital soundscape, streaming 400+ tracks across genres like electronic, rap, R&B, indie, and ambient. The app features a dynamic hero section, genre-based theming, and a welcoming audio experience for new visitors.
 
-1.  **Clone the repository:**
-    ```sh
-    git clone <YOUR_GIT_REPOSITORY_URL>
-    ```
-2.  **Navigate to the project directory:**
-    ```sh
-    cd <YOUR_PROJECT_NAME> # e.g., cd OGRadio
-    ```
-3.  **Install dependencies:**
-    ```sh
-    npm install
-    ```
-    (or `yarn install` if you prefer yarn)
-4.  **Start the development server:**
-    ```sh
-    npm run dev
-    ```
-    This will start the Vite development server, typically available at `http://localhost:8080` (as per your `vite.config.ts`). The site will auto-reload when you make changes to the code.
+---
 
-## Editing the Code
+## Features
 
-You can edit this project using several methods:
+- **Live Streaming:** 24/7 curated music stream.
+- **Genre Selection:** Explore multiple genres with themed visuals.
+- **Animated UI:** Gradient backgrounds, animated stars, and waveforms.
+- **Welcome Audio:** Plays an intro sound on entry.
+- **Responsive Design:** Optimized for desktop and mobile.
+- **Accessible UI:** Keyboard and screen reader friendly.
 
-* **Your Preferred IDE (Recommended):**
-    * Open the cloned project folder in your favorite code editor (like VS Code, WebStorm, etc.).
-    * Make your changes, and the development server (if running via `npm run dev`) will reflect them instantly.
-    * Commit and push your changes to your Git repository.
+---
 
-* **Edit a file directly in GitHub:**
-    * Navigate to the desired file(s) in your GitHub repository.
-    * Click the "Edit" button (pencil icon).
-    * Make your changes and commit them directly to the repository.
+## Folder Structure
 
-* **Use GitHub Codespaces:**
-    * From your repository's main page on GitHub, click the "Code" button.
-    * Select the "Codespaces" tab and create a new codespace.
-    * This provides a full development environment in your browser where you can edit, run, and commit your changes.
+```
+├── public/                  # Static assets (audio, images, etc.)
+│   ├── audio/
+│   ├── placeholder.svg
+│   └── robots.txt
+├── OGRadioFiles/            # Song details and related data
+│   └── SONGDETAILS/
+├── src/                     # Source code
+│   ├── App.tsx
+│   ├── main.tsx
+│   ├── index.css
+│   ├── assets/
+│   ├── components/          # React components (Hero, AboutSection, etc.)
+│   ├── hooks/
+│   ├── lib/
+│   ├── pages/
+│   ├── stores/
+│   └── utils/
+├── index.html               # Main HTML entry point
+├── package.json             # Project metadata and scripts
+├── tailwind.config.ts       # Tailwind CSS configuration
+├── vite.config.ts           # Vite build configuration
+├── tsconfig*.json           # TypeScript configuration
+└── README.md                # Project documentation
+```
+
+---
 
 ## Technologies Used
 
-This project is built with a modern web stack:
+- **React**: UI library for building interactive interfaces.
+- **TypeScript**: Static typing for safer code.
+- **Vite**: Fast development server and build tool.
+- **Tailwind CSS**: Utility-first CSS framework.
+- **shadcn/ui**: Reusable UI components.
+- **Lucide Icons**: Icon set for React.
 
-* **Vite:** Fast build tool and development server.
-* **TypeScript:** For static typing and improved code quality.
-* **React:** A JavaScript library for building user interfaces.
-* **shadcn/ui:** A collection of re-usable UI components.
-* **Tailwind CSS:** A utility-first CSS framework for rapid UI development.
+---
+
+## Setup & Local Development
+
+### Prerequisites
+
+- Node.js (LTS recommended)
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository:**
+    ```sh
+    git clone <YOUR_GIT_REPOSITORY_URL>
+    cd <YOUR_PROJECT_NAME>
+    ```
+2. **Install dependencies:**
+    ```sh
+    npm install
+    ```
+3. **Start the development server:**
+    ```sh
+    npm run dev
+    ```
+    The app will be available at [http://localhost:8080](http://localhost:8080) (see `vite.config.ts`).
+
+---
 
 ## Building for Production
 
-To create an optimized production build of the application:
+To create an optimized build:
 
 ```sh
 npm run build
 ```
 
-This command will generate static assets in the `dist` folder, which can then be deployed.
-
-## Deployment
-
-You can deploy this Vite-based React application to various hosting platforms. Some popular choices include:
-
-* Vercel
-* Netlify
-* GitHub Pages (for static SPAs)
-* AWS Amplify, Google Firebase Hosting, Azure Static Web Apps, etc.
-
-Typically, you would connect your Git repository to one of these services. They can then automatically build and deploy your site whenever you push changes to your main branch.
-
-## Connecting a Custom Domain
-
-Most hosting platforms (like Vercel, Netlify, etc.) allow you to connect a custom domain to your deployed project. Please refer to the documentation of your chosen hosting provider for specific instructions on how to set this up.
+The output will be in the `dist` folder.
 
 ---
 
-Remember to replace `<YOUR_GIT_REPOSITORY_URL>` and `<YOUR_PROJECT_NAME>` with your actual project details.
+## Deployment
 
-Let me know if you'd like any adjustments to this README or if you're ready to dive into specific enhancements for OnkelGashi Radio!
+Deploy the contents of `dist` to your preferred static hosting provider:
+
+- Vercel
+- Netlify
+- GitHub Pages
+- AWS Amplify, Firebase Hosting, Azure Static Web Apps, etc.
+
+---
+
+## Custom Domain
+
+Most hosting platforms allow you to connect a custom domain. Refer to your provider's documentation for details.
+
+---
+
+## Contributing
+
+Pull requests and issues are welcome! Please open an issue to discuss your ideas or report bugs.
+
+---
+
+## License
+
+[MIT](LICENSE) (or specify your license here)
+
+---

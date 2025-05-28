@@ -2,15 +2,28 @@ import { Calendar, Clock, Radio, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getHeadingTextColorClass, getBodyTextColorClass } from "@/utils/textColors";
 import ScheduleCTAButton from "@/components/ScheduleCTAButton";
+import { getDynamicTextClass } from "@/utils/textColors";
 
 type StreamScheduleProps = {
   activeGenre?: string | null;
 };
 
+const genreGradientMap: Record<string, string> = {
+  lofi: "from-[#A0522D] via-[#E0BBE4] to-[#957DAD]",
+  "hip-hop": "from-[#FF00FF] via-[#FFFF00] to-[#00CCFF]",
+  electronic: "from-[#0A0A2A] via-[#6600FF] to-[#00FFFF]",
+  rap: "from-[#333333] via-[#FF6600] to-[#FFCC00]",
+  rnb: "from-[#4A0033] via-[#800040] to-[#FF99CC]",
+  indie: "from-[#6B7A8F] via-[#A7C7E7] to-[#E6E6FA]",
+  ambient: "from-[#0D0D1A] via-[#330066] to-[#66FFFF]",
+  jazz: "from-[#1A1A1A] via-[#4F4F4F] to-[#B28B00]",
+  rock: "from-[#330000] via-[#CC0000] to-[#FF9900]",
+  experimental: "from-[#FF0000] via-[#00FF00] to-[#0000FF]",
+  // Add more as needed
+};
+
 const StreamSchedule = ({ activeGenre }: StreamScheduleProps) => {
-  // 👇 PASTE YOUR FULL SCHEDULE ARRAY HERE
   const schedule = [
     {
       id: 1,
@@ -38,14 +51,27 @@ const StreamSchedule = ({ activeGenre }: StreamScheduleProps) => {
     }
   ];
 
+  // Get the gradient for the active genre, or fallback
+  const gradientString =
+    (activeGenre && genreGradientMap[activeGenre]) || "from-blue-900/70 to-[#0d1117]";
+  const headingTextClass = getDynamicTextClass(gradientString);
+  const bodyTextClass = getDynamicTextClass(gradientString);
+
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 relative">
+      {/* Spicy animated gradient background */}
+      <div className={`absolute inset-0 spicy-bg bg-gradient-to-br ${gradientString} z-[-1]`} />
+      {/* Animated blobs for extra depth */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="absolute w-96 h-96 bg-pink-400/30 rounded-full blur-3xl animate-pulse left-1/4 top-1/3"></div>
+        <div className="absolute w-80 h-80 bg-cyan-400/20 rounded-full blur-2xl animate-pulse right-1/4 bottom-1/4"></div>
+      </div>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className={`text-4xl sm:text-5xl font-bold mb-6 transition-colors duration-300 ${getHeadingTextColorClass(activeGenre || null)}`}>
+          <h2 className={`text-4xl sm:text-5xl font-bold mb-6 transition-colors duration-300 ${headingTextClass}`}>
             Stream Schedule
           </h2>
-          <p className={`text-lg max-w-2xl mx-auto transition-colors duration-300 ${getBodyTextColorClass(activeGenre || null)}`}>
+          <p className={`text-lg max-w-2xl mx-auto transition-colors duration-300 ${bodyTextClass}`}>
             Catch live shows, exclusive premieres, and special events. Your soundtrack is always on.
           </p>
         </div>

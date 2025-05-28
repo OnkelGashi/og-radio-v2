@@ -154,4 +154,59 @@
       opacity: 0.7;
     }
   }
+  @keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  @keyframes spin-slow {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(360deg);}
+  }
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+  }
+  .spicy-bg {
+    background-size: 300% 300%; /* more dramatic movement */
+    animation: gradientMove 12s ease-in-out infinite;
+  }
+  .animate-spin-slow {
+    animation: spin-slow 20s linear infinite;
+  }
+  .animate-pulse-slow {
+    animation: pulse-slow 4s ease-in-out infinite;
+  }
+}
+
+/* Optionally, add genre-specific background helpers for fallback or non-Tailwind use */
+.bg-hiphop-wild {
+  background: linear-gradient(120deg, #FF00FF 0%, #FFFF00 30%, #00CCFF 60%, #FF6600 80%, #00FF00 100%);
+}
+.bg-electronic-wild {
+  background: linear-gradient(120deg, #0A0A2A 0%, #6600FF 30%, #00FFFF 60%, #FF00CC 80%, #00FF99 100%);
+}
+.bg-rap-wild {
+  background: linear-gradient(120deg, #333333 0%, #FF6600 30%, #FFCC00 60%, #FF0099 80%, #00FFCC 100%);
+}
+.bg-rnb-wild {
+  background: linear-gradient(120deg, #4A0033 0%, #800040 30%, #FF99CC 60%, #FFD700 80%, #00CFFF 100%);
+}
+.bg-indie-wild {
+  background: linear-gradient(120deg, #6B7A8F 0%, #A7C7E7 25%, #FFDDC1 50%, #E6E6FA 75%, #22223B 100%);
+}
+.bg-ambient-wild {
+  background: linear-gradient(120deg, #0D0D1A 0%, #330066 30%, #66FFFF 60%, #B2FEFA 80%, #1A2980 100%);
+}
+.bg-jazz-wild {
+  background: linear-gradient(120deg, #1A1A1A 0%, #4F4F4F 30%, #B28B00 60%, #FFD700 80%, #FF6F00 100%);
+}
+.bg-rock-wild {
+  background: linear-gradient(120deg, #330000 0%, #CC0000 30%, #FF9900 60%, #FF00CC 80%, #00FF00 100%);
+}
+.bg-lofi-wild {
+  background: linear-gradient(120deg, #A0522D 0%, #E0BBE4 30%, #957DAD 60%, #22223B 80%, #FFB347 100%);
+}
+.bg-experimental-wild {
+  background: linear-gradient(120deg, #FF0000 0%, #00FF00 25%, #0000FF 50%, #FFFF00 75%, #FF00FF 100%);
 }

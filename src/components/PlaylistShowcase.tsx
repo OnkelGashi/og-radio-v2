@@ -3,16 +3,27 @@ import { Play, Shuffle, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { getHeadingTextColorClass, getBodyTextColorClass } from "@/utils/textColors";
+import { getDynamicTextClass } from "@/utils/textColors"; // <-- import the dynamic helper
 
 type Props = {
   activeGenre?: string | null;
 };
 
+const genreGradientMap: Record<string, string> = {
+  ambient: "from-blue-600 to-indigo-600",
+  indie: "from-cyan-600 to-blue-600",
+  lofi: "from-purple-600 to-pink-600",
+  jazz: "from-orange-600 to-red-600",
+  trap: "from-purple-600 to-pink-600",
+  edm: "from-green-600 to-teal-600",
+  cinematic: "from-orange-600 to-red-600",
+  electronic: "from-violet-600 to-purple-600",
+  // Add more as needed
+};
+
 const PlaylistShowcase = ({ activeGenre }: Props) => {
   const [activeFilter, setActiveFilter] = useState("All");
 
-  // 👇 PASTE YOUR FULL PLAYLIST ARRAY HERE
   const playlists = [
     {
       id: 1,
@@ -75,22 +86,19 @@ const PlaylistShowcase = ({ activeGenre }: Props) => {
     ? playlists
     : playlists.filter(playlist => playlist.mood === activeFilter);
 
+  // Get the gradient for the active genre, or fallback
+  const gradientString =
+    (activeGenre && genreGradientMap[activeGenre.toLowerCase()]) || "from-purple-600 to-pink-600";
+  const headingTextClass = getDynamicTextClass(gradientString);
+
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 relative transition-colors duration-500">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className={`text-4xl sm:text-5xl font-bold mb-6 transition-colors duration-300 ${
-    activeGenre === "ambient" || activeGenre === "indie" || activeGenre === "lofi" || activeGenre === "jazz"
-      ? "text-white"
-      : getHeadingTextColorClass(activeGenre || null)
-  }`}>
+          <h2 className={`text-4xl sm:text-5xl font-bold mb-6 transition-colors duration-300 ${headingTextClass}`}>
             Mo0d Playlists
           </h2>
-          <p className={`text-2xl max-w-2xl mx-auto mb-8 transition-colors duration-300 ${
-    activeGenre === "ambient" || activeGenre === "indie" || activeGenre === "lofi" || activeGenre === "jazz"
-      ? "text-white"
-      : getBodyTextColorClass(activeGenre || null)
-  }`}>
+          <p className={`text-2xl max-w-2xl mx-auto mb-8 transition-colors duration-300 ${headingTextClass}`}>
             Discover collections crafted for every mood and moment. Each playlist tells a unique sonic story.
           </p>
           <div className="flex flex-wrap justify-center gap-3 mb-8">

@@ -3,9 +3,9 @@ import { Play, Radio, Zap, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAudioStore } from "@/stores/audioStore";
+import { getDynamicTextClass } from "@/utils/textColors";
 
-const getHeadingTextColorClass = (genre: string | null) => "text-gray-200";
-const getBodyTextColorClass = (genre: string | null) => "text-gray-200";
+const HERO_GRADIENT = "from-blue-900/70 via-indigo-950/50 to-[#0d1117]";
 
 const Hero = () => {
   const [showEnterScreen, setShowEnterScreen] = useState(true);
@@ -23,6 +23,9 @@ const Hero = () => {
       section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
+
+  // Use dynamic text class for hero background
+  const heroTextClass = getDynamicTextClass(HERO_GRADIENT);
 
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden">
@@ -64,8 +67,13 @@ const Hero = () => {
           showEnterScreen ? "opacity-0 pointer-events-none absolute" : "opacity-100 relative"
         }`}
       >
-        <div className="absolute inset-0 bg-gradient-radial from-blue-900/70 via-indigo-950/50 to-[#0d1117] -z-10"></div>
-        
+        {/* Spicy animated gradient background */}
+        <div className={`absolute inset-0 spicy-bg bg-gradient-to-br ${HERO_GRADIENT} -z-10`} />
+        {/* Animated blobs for extra depth */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <div className="absolute w-96 h-96 bg-pink-400/30 rounded-full blur-3xl animate-pulse left-1/4 top-1/3"></div>
+          <div className="absolute w-80 h-80 bg-cyan-400/20 rounded-full blur-2xl animate-pulse right-1/4 bottom-1/4"></div>
+        </div>
         <div className="absolute inset-0 pointer-events-none -z-20">
           {[...Array(120)].map((_, i) => (
             <div
@@ -129,11 +137,11 @@ const Hero = () => {
           </h2>
           <div className="flex items-center justify-center mb-4">
             <Radio className="w-6 h-6 text-cyan-400 mr-3" />
-            <span className={`text-2xl sm:text-3xl lg:text-4xl font-light tracking-widest ${getHeadingTextColorClass(null)}`}>
+            <span className={`text-2xl sm:text-3xl lg:text-4xl font-light tracking-widest ${heroTextClass}`}>
               Sound for Hyperactive Minds & True Creators
             </span>
           </div>
-          <p className={`text-xl sm:text-2xl mb-8 max-w-2xl mx-auto leading-relaxed ${getBodyTextColorClass(null)}`}>
+          <p className={`text-xl sm:text-2xl mb-8 max-w-2xl mx-auto leading-relaxed ${heroTextClass}`}>
             Enter a living digital soundscape—always genre-bending, always evolving.<br />
             <span className="text-cyan-300 font-bold">400+</span> tracks designed for restless focus, deep feels, and creative flow—streaming nonstop from the OG multiverse.
           </p>
