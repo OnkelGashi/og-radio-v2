@@ -1,12 +1,36 @@
 // src/components/GenreBackground.tsx
 import React from "react";
+import { useUIStore } from "../stores/uiStore";
 
 // FULL DYNAMIC GENRE BACKGROUND — ALL GENRES!
-const GenreBackground = ({ genre }: { genre: string | null }) => {
+const GenreBackground = ({
+  genre,
+}: {
+  genre: string | null;
+}) => {
+  const nightMode = useUIStore((s) => s.nightMode);
+
+  const genreGradientMap: Record<string, string> = {
+    lofi: "from-[#6EE7B7] via-[#3B82F6] to-[#9333EA]",
+    "hip-hop": "from-[#F59E42] via-[#F43F5E] to-[#6366F1]",
+    electronic: "from-[#06B6D4] via-[#818CF8] to-[#F472B6]",
+    rap: "from-[#FBBF24] via-[#F87171] to-[#1E293B]",
+    experimental: "from-[#C084FC] via-[#F472B6] to-[#F59E42]",
+    rnb: "from-pink-700/60 via-pink-400/40 to-purple-900/80",
+    indie: "from-[#c7d2fe] via-[#64748b]/70 to-[#161927]/95",
+    ambient: "from-sky-900/80 via-teal-800/60 to-[#161927]",
+    jazz: "from-amber-700/60 via-orange-400/40 to-orange-900/80",
+    rock: "from-red-900/60 via-red-900/40 to-black",
+  };
+
   // Fallback/Default background
   if (!genre) {
     return (
-      <div className="fixed inset-0 -z-10 bg-gradient-to-b from-[#101018] via-[#181c32] to-[#181b26] opacity-95 transition-all duration-700"></div>
+      <div className={`fixed inset-0 -z-10 bg-gradient-to-b ${
+        nightMode
+          ? "from-[#23243a] via-[#181825] to-[#23243a]"
+          : "from-[#6EE7B7] via-[#3B82F6] to-[#9333EA]"
+      } opacity-95 transition-all duration-700`}></div>
     );
   }
 
@@ -15,8 +39,11 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
     case "lofi":
       return (
         <div className="fixed inset-0 -z-10 overflow-hidden transition-all duration-700">
-          {/* Deeper pastel gradient with dark overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-pink-400/60 via-blue-400/60 to-purple-700/70 blur-md" />
+          <div className={
+            nightMode
+              ? "absolute inset-0 bg-gradient-to-b from-gray-800 via-gray-900 to-black blur-md"
+              : "absolute inset-0 bg-gradient-to-b from-pink-400/60 via-blue-400/60 to-purple-700/70 blur-md"
+          } />
           <div className="absolute inset-0 bg-black/30" />
           {[...Array(9)].map((_, i) => (
             <div
@@ -54,8 +81,11 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
     case "hip-hop":
       return (
         <div className="fixed inset-0 -z-10 overflow-hidden transition-all duration-700 bg-black">
-          {/* Deeper city gradient */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900/90 to-[#181c32] opacity-95" />
+          <div className={
+            nightMode
+              ? "absolute inset-0 bg-gradient-to-b from-black via-gray-900 to-[#181c32] opacity-98"
+              : "absolute inset-0 bg-gradient-to-b from-black via-gray-900/90 to-[#181c32] opacity-95"
+          } />
           <div className="absolute inset-0 bg-black/40" />
           <svg
             className="absolute bottom-0 left-0 w-full h-44 opacity-70"
@@ -77,16 +107,32 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
           <div className="absolute bottom-44 left-1/2 -translate-x-1/2 w-[380px] h-32 bg-yellow-400/10 blur-2xl rounded-full z-0"></div>
           {/* EQ Bars */}
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex space-x-1 z-10">
-            {[...Array(14)].map((_, i) => (
-              <div
-                key={i}
-                className="w-2 rounded-md bg-gradient-to-t from-yellow-400 to-amber-700"
-                style={{
-                  height: `${30 + Math.random() * 50}px`,
-                  animation: `eqPulse 0.8s ease-in-out ${i * 0.09}s infinite alternate`,
-                }}
-              />
-            ))}
+            {[...Array(14)].map((_, i) => {
+              // Persist EQ bar heights in sessionStorage
+              let eqHeights: number[] = [];
+              if (typeof window !== "undefined") {
+                const stored = sessionStorage.getItem("og_eq_bars");
+                if (stored) {
+                  eqHeights = JSON.parse(stored);
+                } else {
+                  eqHeights = Array.from({ length: 14 }, () => 30 + Math.random() * 50);
+                  sessionStorage.setItem("og_eq_bars", JSON.stringify(eqHeights));
+                }
+              }
+              // Animate only if not stored, else use stored heights
+              return (
+                <div
+                  key={i}
+                  className="w-2 rounded-md bg-gradient-to-t from-yellow-400 to-amber-700"
+                  style={{
+                    height: eqHeights[i] ? `${eqHeights[i]}px` : `${30 + Math.random() * 50}px`,
+                    animation: eqHeights.length
+                      ? undefined
+                      : `eqPulse 0.8s ease-in-out ${i * 0.09}s infinite alternate`,
+                  }}
+                />
+              );
+            })}
           </div>
           <style>
             {`
@@ -104,8 +150,11 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
     case "electronic":
       return (
         <div className="fixed inset-0 -z-10 overflow-hidden transition-all duration-700">
-          {/* More saturated neon gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#00e4ff] via-[#0f0025] to-[#b180fc] opacity-95 blur-md" />
+          <div className={
+            nightMode
+              ? "absolute inset-0 bg-gradient-to-br from-[#181825] via-[#23243a] to-[#181b26] opacity-98 blur-md"
+              : "absolute inset-0 bg-gradient-to-br from-[#00e4ff] via-[#0f0025] to-[#b180fc] opacity-95 blur-md"
+          } />
           <div className="absolute inset-0 bg-black/40" />
           <div className="absolute inset-0 flex justify-center items-center">
             {[...Array(3)].map((_, i) => (
@@ -151,8 +200,11 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
     case "rap":
       return (
         <div className="fixed inset-0 -z-10 overflow-hidden transition-all duration-700 bg-black">
-          {/* Deeper purple/fuchsia gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-black via-fuchsia-900/60 to-indigo-900/90 opacity-95" />
+          <div className={
+            nightMode
+              ? "absolute inset-0 bg-gradient-to-br from-black via-fuchsia-900 to-indigo-900/90 opacity-98"
+              : "absolute inset-0 bg-gradient-to-br from-black via-fuchsia-900/60 to-indigo-900/90 opacity-95"
+          } />
           <div className="absolute inset-0 bg-black/40" />
           <svg
             className="absolute bottom-0 left-0 w-full h-40 opacity-70"
@@ -178,8 +230,11 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
     case "rnb":
       return (
         <div className="fixed inset-0 -z-10 overflow-hidden transition-all duration-700">
-          {/* Deeper pink/purple gradient */}
-          <div className="absolute inset-0 bg-gradient-to-b from-pink-700/60 via-pink-400/40 to-purple-900/80 blur-lg" />
+          <div className={
+            nightMode
+              ? "absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-800 to-black blur-lg"
+              : "absolute inset-0 bg-gradient-to-b from-pink-700/60 via-pink-400/40 to-purple-900/80 blur-lg"
+          } />
           <div className="absolute inset-0 bg-black/30" />
           <svg
             className="absolute bottom-0 left-0 w-full h-32"
@@ -399,7 +454,11 @@ const GenreBackground = ({ genre }: { genre: string | null }) => {
     // --- DEFAULT: OG Cosmic Gradient ---
     default:
       return (
-        <div className="fixed inset-0 -z-10 bg-gradient-to-b from-[#101018] via-[#181c32] to-[#181b26] opacity-95 transition-all duration-700"></div>
+        <div className={`fixed inset-0 -z-10 bg-gradient-to-b ${
+          nightMode
+            ? "from-[#23243a] via-[#181825] to-[#23243a]"
+            : "from-[#6EE7B7] via-[#3B82F6] to-[#9333EA]"
+        } opacity-95 transition-all duration-700`}></div>
       );
   }
 };

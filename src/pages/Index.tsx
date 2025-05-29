@@ -3,14 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Hero from "@/components/Hero";
 import AboutSection from "@/components/AboutSection";
-import PlaylistShowcase from "@/components/PlaylistShowcase";
 import NowPlaying from "@/components/NowPlaying";
 import StreamSchedule from "@/components/StreamSchedule";
 import SocialFooter from "@/components/SocialFooter";
 import GenreStations from "@/components/GenreStations";
 import { useAudioStore } from "@/stores/audioStore";
 import GenreBackground from "@/components/GenreBackground";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+
 
 export default function Index() {
   const { activeGenreForTheme } = useAudioStore();
@@ -30,7 +30,6 @@ export default function Index() {
         <GenreStations activeGenre={activeGenre} setActiveGenre={setActiveGenre} />
       </div>
 
-      <PlaylistShowcase activeGenre={activeGenreForTheme} />
       <StreamSchedule activeGenre={activeGenreForTheme} />
       <SocialFooter />
     </div>

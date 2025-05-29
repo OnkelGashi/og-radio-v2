@@ -2,6 +2,7 @@
 // (This is the refined code from the previous response - ensure this is in place)
 import { create } from 'zustand';
 import { toast } from "@/components/ui/sonner";
+import { useRef } from "react";
 
 export interface NowPlayingInfo {
   id: string;
@@ -15,6 +16,8 @@ export interface NowPlayingInfo {
 
 interface AudioState {
   audioElement: HTMLAudioElement | null;
+  audioContext: AudioContext | null;
+  mediaElementSource: MediaElementAudioSourceNode | null;
   isPlaying: boolean;
   nowPlayingInfo: NowPlayingInfo | null;
   lastPlayedInfo: NowPlayingInfo | null;
@@ -22,8 +25,9 @@ interface AudioState {
   volume: number;
   activeGenreForTheme: string | null;
   isVisualizerOpen: boolean;
+  hasPlayedWelcomeThisSession: boolean; // <-- Add this line!
 
-  setAudioElement: (element: HTMLAudioElement) => void;
+  setAudioElement: (element: HTMLAudioElement | null) => void;
   playItem: (itemInfo: NowPlayingInfo) => void;
   playWelcomeAndThenDefault: () => void;
   togglePlayPause: () => void;
@@ -54,20 +58,37 @@ export const EMPTY_NOW_PLAYING_INFO: NowPlayingInfo = {
 
 export const useAudioStore = create<AudioState>((set, get) => ({
   audioElement: null,
+  audioContext: null,
+  mediaElementSource: null,
   isPlaying: false,
   nowPlayingInfo: EMPTY_NOW_PLAYING_INFO,
   lastPlayedInfo: null,
   isWelcomeAudioPlaying: false,
-  volume: 1,
+  volume: 0.5, // 50% by default
   activeGenreForTheme: null,
   isVisualizerOpen: false,
+  hasPlayedWelcomeThisSession: false, // <-- Add this line!
 
   setAudioElement: (element) => {
-    const { volume } = get();
-    if (element) {
-      element.volume = volume;
+    if (!element) {
+      set({ audioElement: null, mediaElementSource: null });
+      return;
     }
-    set({ audioElement: element });
+    let ctx = get().audioContext;
+    if (!ctx) {
+      ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      set({ audioContext: ctx });
+    }
+    // Always create a new MediaElementSource for a new element
+    let src: MediaElementAudioSourceNode | null = null;
+    try {
+      src = ctx.createMediaElementSource(element);
+      src.connect(ctx.destination); // <-- Ensure connection here!
+    } catch (e) {
+      // If already created for this element, reuse the previous one
+      src = get().mediaElementSource || null;
+    }
+    set({ audioElement: element, mediaElementSource: src });
   },
 
   setActiveGenreForTheme: (genreId) => {
@@ -89,7 +110,23 @@ export const useAudioStore = create<AudioState>((set, get) => ({
   },
 
   playItem: (itemInfo) => {
-    const { audioElement, volume, setActiveGenreForTheme, stopPlayback } = get();
+    const { audioElement, audioContext, mediaElementSource, volume, setActiveGenreForTheme, stopPlayback } = get();
+
+    // Block welcome audio if already played this session
+    if (
+      itemInfo.type === 'welcome' &&
+      get().hasPlayedWelcomeThisSession
+    ) {
+      toast("Welcome audio can only be played once per session.", {
+        className: "bg-yellow-700 text-white"
+      });
+      return;
+    }
+
+    // Mark welcome as played if it's being played now
+    if (itemInfo.type === 'welcome') {
+      set({ hasPlayedWelcomeThisSession: true });
+    }
 
     if (!itemInfo || !itemInfo.src || typeof itemInfo.src !== 'string' || itemInfo.src.trim() === "") {
       if (get().nowPlayingInfo?.id === itemInfo?.id) {
@@ -125,6 +162,15 @@ export const useAudioStore = create<AudioState>((set, get) => ({
     audioElement.src = itemInfo.src;
     audioElement.volume = volume;
     audioElement.onended = null;
+
+    // Ensure audio is connected
+    if (audioElement && audioContext && mediaElementSource) {
+      try {
+        mediaElementSource.connect(audioContext.destination);
+      } catch (e) {
+        // Already connected, ignore
+      }
+    }
 
     const playPromise = audioElement.play();
 
@@ -217,5 +263,21 @@ export const useAudioStore = create<AudioState>((set, get) => ({
 
   setIsVisualizerOpen: (isOpen) => set({ isVisualizerOpen: isOpen }),
 }));
+
+const useInitAudioContext = () => {
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const mediaElementSourceRef = useRef<MediaElementAudioSourceNode | null>(null);
+
+  const initAudioContext = (audioElement: HTMLAudioElement) => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new window.AudioContext();
+      mediaElementSourceRef.current = audioContextRef.current.createMediaElementSource(audioElement);
+      mediaElementSourceRef.current.connect(audioContextRef.current.destination);
+      // Save these in your Zustand store if needed
+    }
+  };
+
+  return { initAudioContext };
+};
 
 // No hook calls outside components!

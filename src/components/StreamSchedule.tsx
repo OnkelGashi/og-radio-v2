@@ -4,26 +4,29 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import ScheduleCTAButton from "@/components/ScheduleCTAButton";
 import { getDynamicTextClass } from "@/utils/textColors";
+import { useUIStore } from "@/stores/uiStore";
 
 type StreamScheduleProps = {
   activeGenre?: string | null;
 };
 
 const genreGradientMap: Record<string, string> = {
-  lofi: "from-[#A0522D] via-[#E0BBE4] to-[#957DAD]",
-  "hip-hop": "from-[#FF00FF] via-[#FFFF00] to-[#00CCFF]",
-  electronic: "from-[#0A0A2A] via-[#6600FF] to-[#00FFFF]",
-  rap: "from-[#333333] via-[#FF6600] to-[#FFCC00]",
-  rnb: "from-[#4A0033] via-[#800040] to-[#FF99CC]",
-  indie: "from-[#6B7A8F] via-[#A7C7E7] to-[#E6E6FA]",
-  ambient: "from-[#0D0D1A] via-[#330066] to-[#66FFFF]",
-  jazz: "from-[#1A1A1A] via-[#4F4F4F] to-[#B28B00]",
-  rock: "from-[#330000] via-[#CC0000] to-[#FF9900]",
-  experimental: "from-[#FF0000] via-[#00FF00] to-[#0000FF]",
+  lofi: "from-[#6EE7B7] via-[#3B82F6] to-[#9333EA]",
+  "hip-hop": "from-[#F59E42] via-[#F43F5E] to-[#6366F1]",
+  electronic: "from-[#06B6D4] via-[#818CF8] to-[#F472B6]",
+  rap: "from-[#FBBF24] via-[#F87171] to-[#1E293B]",
+  experimental: "from-[#C084FC] via-[#F472B6] to-[#F59E42]",
+  rnb: "from-pink-700/60 via-pink-400/40 to-purple-900/80",
+  indie: "from-[#c7d2fe] via-[#64748b]/70 to-[#161927]/95",
+  ambient: "from-sky-900/80 via-teal-800/60 to-[#161927]",
+  jazz: "from-amber-700/60 via-orange-400/40 to-orange-900/80",
+  rock: "from-red-900/60 via-red-900/40 to-black",
   // Add more as needed
 };
 
 const StreamSchedule = ({ activeGenre }: StreamScheduleProps) => {
+  const nightMode = useUIStore((s) => s.nightMode);
+
   const schedule = [
     {
       id: 1,
@@ -53,32 +56,59 @@ const StreamSchedule = ({ activeGenre }: StreamScheduleProps) => {
 
   // Get the gradient for the active genre, or fallback
   const gradientString =
-    (activeGenre && genreGradientMap[activeGenre]) || "from-blue-900/70 to-[#0d1117]";
+    (activeGenre && genreGradientMap[activeGenre]) || "from-[#6EE7B7] via-[#3B82F6] to-[#9333EA]";
   const headingTextClass = getDynamicTextClass(gradientString);
   const bodyTextClass = getDynamicTextClass(gradientString);
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 relative">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 relative bg-transparent">
       {/* Spicy animated gradient background */}
-      <div className={`absolute inset-0 spicy-bg bg-gradient-to-br ${gradientString} z-[-1]`} />
+      {/* Remove or comment out the following div to show the LiveBackground behind the section */}
+      {/*
+      <div className={`absolute inset-0 spicy-bg bg-gradient-to-br ${
+        nightMode
+          ? "from-[#23243a] via-[#181825] to-[#23243a]"
+          : gradientString
+      } z-[-1]`} />
+      */}
       {/* Animated blobs for extra depth */}
+      {/* Optionally remove the blobs too if you want only LiveBackground */}
+      {/*
       <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute w-96 h-96 bg-pink-400/30 rounded-full blur-3xl animate-pulse left-1/4 top-1/3"></div>
-        <div className="absolute w-80 h-80 bg-cyan-400/20 rounded-full blur-2xl animate-pulse right-1/4 bottom-1/4"></div>
+        <div className={`absolute w-96 h-96 rounded-full blur-3xl animate-pulse left-1/4 top-1/3 ${
+          nightMode ? "bg-gray-700/40" : "bg-pink-400/30"
+        }`}></div>
+        <div className={`absolute w-80 h-80 rounded-full blur-2xl animate-pulse right-1/4 bottom-1/4 ${
+          nightMode ? "bg-gray-800/30" : "bg-cyan-400/20"
+        }`}></div>
       </div>
+      */}
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className={`text-4xl sm:text-5xl font-bold mb-6 transition-colors duration-300 ${headingTextClass}`}>
+          <h2 className={`text-4xl sm:text-5xl font-bold mb-6 transition-colors duration-300 ${
+            nightMode
+              ? "bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 bg-clip-text text-transparent"
+              : headingTextClass
+          }`}>
             Stream Schedule
           </h2>
-          <p className={`text-lg max-w-2xl mx-auto transition-colors duration-300 ${bodyTextClass}`}>
+          <p className={`text-lg max-w-2xl mx-auto transition-colors duration-300 ${
+            nightMode ? "text-gray-300" : bodyTextClass
+          }`}>
             Catch live shows, exclusive premieres, and special events. Your soundtrack is always on.
           </p>
         </div>
         {/* Schedule Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {schedule.map((show) => (
-            <Card key={show.id} className="bg-gray-900/50 border-gray-700 hover:border-gray-600 transition-all duration-300 group">
+            <Card
+              key={show.id}
+              className={`transition-all duration-300 group
+                ${nightMode
+                  ? ""
+                  : ""}
+              `}
+            >
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center">
@@ -103,7 +133,11 @@ const StreamSchedule = ({ activeGenre }: StreamScheduleProps) => {
                 <h3 className="text-xl font-bold text-white mb-2">{show.title}</h3>
                 <p className="text-gray-400 text-sm mb-4">{show.description}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">
+                  <span className={`text-xs px-2 py-1 rounded ${
+                    nightMode
+                      ? "text-gray-400 bg-gray-800"
+                      : "text-gray-500 bg-gray-800"
+                  }`}>
                     {show.type}
                   </span>
                   {show.status === 'live' && (
@@ -124,6 +158,7 @@ const StreamSchedule = ({ activeGenre }: StreamScheduleProps) => {
           </ScheduleCTAButton>
         </div>
       </div>
+      {/* ...existing code... */}
     </section>
   );
 };

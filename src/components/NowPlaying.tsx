@@ -20,10 +20,13 @@ import {
   Radio,
 } from "lucide-react";
 import { useAudioStore, NowPlayingInfo, EMPTY_NOW_PLAYING_INFO } from "@/stores/audioStore";
+import { useUIStore } from "@/stores/uiStore";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/sonner"; // Make sure this is imported
+import NightModeToggle from "@/components/NightModeToggle";
+import Equalizer from "@/components/Equalizer";
 
 const shareLinks = [
   { name: "WhatsApp", icon: MessageCircle, color: "bg-green-500/10 text-green-500", url: "https://wa.me/?text=https://onkelgashi.de" },
@@ -51,6 +54,8 @@ const NowPlaying = () => {
     playItem,
   } = store;
 
+  const nightMode = useUIStore((s) => s.nightMode);
+ const [showEqualizer, setShowEqualizer] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [previousVolume, setPreviousVolume] = useState(0.5);
@@ -193,16 +198,33 @@ const NowPlaying = () => {
       const section = document.getElementById("genre-stations-section");
       if (section) {
         section.scrollIntoView({ behavior: "smooth", block: "start" });
-        // Optionally: show a toast here to guide the user
       }
+      // Optionally: show a toast here to guide the user
     } else {
       togglePlayPauseAction();
     }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if typing in an input or textarea
+      if (
+        e.code === "Space" &&
+        !(document.activeElement && ["INPUT", "TEXTAREA"].includes(document.activeElement.tagName))
+      ) {
+        e.preventDefault();
+        handleTogglePlayPause();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleTogglePlayPause]);
+
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm border-b border-gray-800">
+      <div className={`fixed top-0 left-0 right-0 z-50 border-b border-gray-800
+  bg-black/90 backdrop-blur-sm
+`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-2">
             <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
@@ -231,13 +253,23 @@ const NowPlaying = () => {
                   {currentGenre && ` • ${currentGenre}`}
                 </p>
               </div>
-              <div className="flex items-center ml-1 md:ml-3 shrink-0">
+              <div className="flex items-center ml-1 md:ml-3 shrink-0 gap-2">
                 <div className="hidden sm:flex bg-red-600/20 text-red-400 border border-red-500/30 rounded-full px-2 py-0.5 text-xs font-medium items-center mr-1.5 shrink-0">
                   <div className="w-1.5 h-1.5 bg-red-500 rounded-full mr-1 md:mr-2 animate-pulse"></div>
                   LIVE
                 </div>
+                <NightModeToggle />
                 <Button
-                  onClick={handleTogglePlayPause} // Use the new handler
+                  variant="ghost"
+                  size="icon"
+                  className="text-cyan-400 hover:text-white w-7 h-7 p-1"
+                  onClick={() => setShowEqualizer(true)}
+                  aria-label="Equalizer"
+                >
+                  <Music className="w-full h-full" />
+                </Button>
+                <Button
+                  onClick={handleTogglePlayPause}
                   variant="default"
                   size="icon"
                   className="ml-0 bg-blue-600 hover:bg-blue-500 text-white rounded-full p-1 sm:p-2 w-8 h-8 sm:w-auto sm:h-auto"
@@ -329,6 +361,17 @@ const NowPlaying = () => {
                 </div>
                 <div className="mt-3 text-xs text-center text-gray-500">(Link kopieren und überall teilen)</div>
             </div>
+        </div>
+      )}
+      {showEqualizer && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setShowEqualizer(false)}>
+          <div className="bg-[#181c32] p-6 rounded-2xl border border-gray-700 shadow-2xl max-w-lg w-full relative mx-4" onClick={e => e.stopPropagation()}>
+            <Button variant="ghost" size="icon" className="absolute top-2 right-2 text-gray-500 hover:text-white w-7 h-7 p-1" onClick={() => setShowEqualizer(false)}>
+              <Close className="w-full h-full" />
+            </Button>
+            <h2 className="text-xl font-bold text-white mb-4">Equalizer</h2>
+            <Equalizer />
+          </div>
         </div>
       )}
     </>
